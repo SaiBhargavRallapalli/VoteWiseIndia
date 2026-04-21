@@ -1,0 +1,360 @@
+/**
+ * @fileoverview VoteWise India — Test Suite
+ * @description Comprehensive tests for all API endpoints, validation,
+ *   caching, security headers, and quiz logic.
+ */
+
+'use strict';
+
+const request = require('supertest');
+const { app, server, ELECTION_DATA } = require('../server');
+
+afterAll(() => new Promise(resolve => server.close(resolve)));
+
+// ── Health ──────────────────────────────────────────────────────────────────
+describe('GET /api/health', () => {
+  it('returns status ok', async () => {
+    const res = await request(app).get('/api/health');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('ok');
+    expect(res.body.app).toBe('VoteWise India');
+    expect(res.body.timestamp).toBeDefined();
+  });
+});
+
+// ── Config ──────────────────────────────────────────────────────────────────
+describe('GET /api/config', () => {
+  it('returns firebase config object', async () => {
+    const res = await request(app).get('/api/config');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.firebase).toBeDefined();
+    expect(res.body.features).toBeDefined();
+  });
+
+  it('returns feature flags', async () => {
+    const res = await request(app).get('/api/config');
+    expect(typeof res.body.features.auth).toBe('boolean');
+    expect(typeof res.body.features.analytics).toBe('boolean');
+    expect(typeof res.body.features.translate).toBe('boolean');
+  });
+
+  it('sets Cache-Control header', async () => {
+    const res = await request(app).get('/api/config');
+    expect(res.headers['cache-control']).toContain('max-age=3600');
+  });
+});
+
+// ── Election Data ────────────────────────────────────────────────────────────
+describe('GET /api/election', () => {
+  it('returns election data', async () => {
+    const res = await request(app).get('/api/election');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.title).toBeDefined();
+    expect(res.body.keyFacts).toBeDefined();
+    expect(res.body.electionTypes).toBeDefined();
+  });
+
+  it('does not expose quiz questions', async () => {
+    const res = await request(app).get('/api/election');
+    expect(res.body.quizQuestions).toBeUndefined();
+  });
+
+  it('returns 4 election types', async () => {
+    const res = await request(app).get('/api/election');
+    expect(res.body.electionTypes).toHaveLength(4);
+  });
+
+  it('each election type has required fields', async () => {
+    const res = await request(app).get('/api/election');
+    res.body.electionTypes.forEach(t => {
+      expect(t.id).toBeDefined();
+      expect(t.name).toBeDefined();
+      expect(t.desc).toBeDefined();
+      expect(t.nextDue).toBeDefined();
+    });
+  });
+
+  it('returns 4 key facts', async () => {
+    const res = await request(app).get('/api/election');
+    expect(res.body.keyFacts).toHaveLength(4);
+  });
+
+  it('sets Cache-Control header', async () => {
+    const res = await request(app).get('/api/election');
+    expect(res.headers['cache-control']).toContain('max-age=300');
+  });
+
+  it('returns X-Cache header', async () => {
+    const res = await request(app).get('/api/election');
+    expect(['HIT','MISS']).toContain(res.headers['x-cache']);
+  });
+
+  it('second request returns cache HIT', async () => {
+    await request(app).get('/api/election');
+    const res = await request(app).get('/api/election');
+    expect(res.headers['x-cache']).toBe('HIT');
+  });
+});
+
+// ── Steps ────────────────────────────────────────────────────────────────────
+describe('GET /api/steps', () => {
+  it('returns voting steps and registration steps', async () => {
+    const res = await request(app).get('/api/steps');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.votingSteps)).toBe(true);
+    expect(Array.isArray(res.body.registrationSteps)).toBe(true);
+  });
+
+  it('returns 7 voting steps', async () => {
+    const res = await request(app).get('/api/steps');
+    expect(res.body.votingSteps).toHaveLength(7);
+  });
+
+  it('returns 6 registration steps', async () => {
+    const res = await request(app).get('/api/steps');
+    expect(res.body.registrationSteps).toHaveLength(6);
+  });
+
+  it('each voting step has required fields', async () => {
+    const res = await request(app).get('/api/steps');
+    res.body.votingSteps.forEach(s => {
+      expect(s.step).toBeDefined();
+      expect(s.title).toBeDefined();
+      expect(s.description).toBeDefined();
+      expect(s.icon).toBeDefined();
+    });
+  });
+});
+
+// ── Quiz ─────────────────────────────────────────────────────────────────────
+describe('GET /api/quiz', () => {
+  it('returns questions array', async () => {
+    const res = await request(app).get('/api/quiz');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.questions)).toBe(true);
+    expect(res.body.total).toBe(10);
+  });
+
+  it('does not expose answers to client', async () => {
+    const res = await request(app).get('/api/quiz');
+    res.body.questions.forEach(q => {
+      expect(q.answer).toBeUndefined();
+      expect(q.explain).toBeUndefined();
+    });
+  });
+
+  it('each question has id, q, and options', async () => {
+    const res = await request(app).get('/api/quiz');
+    res.body.questions.forEach(q => {
+      expect(q.id).toBeDefined();
+      expect(q.q).toBeDefined();
+      expect(Array.isArray(q.options)).toBe(true);
+      expect(q.options).toHaveLength(4);
+    });
+  });
+});
+
+describe('POST /api/quiz/submit', () => {
+  const validAnswers = new Array(10).fill(0);
+
+  it('returns score and results for valid submission', async () => {
+    const res = await request(app).post('/api/quiz/submit')
+      .send({ answers: validAnswers, sessionId: 'test-session' });
+    expect(res.statusCode).toBe(200);
+    expect(typeof res.body.score).toBe('number');
+    expect(res.body.total).toBe(10);
+    expect(typeof res.body.percentage).toBe('number');
+    expect(res.body.results).toHaveLength(10);
+  });
+
+  it('each result has correct explanation', async () => {
+    const res = await request(app).post('/api/quiz/submit')
+      .send({ answers: validAnswers, sessionId: 'test-session' });
+    res.body.results.forEach(r => {
+      expect(r.explain).toBeDefined();
+      expect(r.isCorrect).toBeDefined();
+    });
+  });
+
+  it('correctly identifies right answers', async () => {
+    const correctAnswers = ELECTION_DATA.quizQuestions.map(q => q.answer);
+    const res = await request(app).post('/api/quiz/submit')
+      .send({ answers: correctAnswers, sessionId: 'test-perfect' });
+    expect(res.body.score).toBe(10);
+    expect(res.body.percentage).toBe(100);
+  });
+
+  it('returns 400 when answers is not array', async () => {
+    const res = await request(app).post('/api/quiz/submit').send({ answers: 'wrong' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when wrong number of answers', async () => {
+    const res = await request(app).post('/api/quiz/submit').send({ answers: [0, 1] });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when answers contain non-numbers', async () => {
+    const res = await request(app).post('/api/quiz/submit')
+      .send({ answers: new Array(10).fill('a') });
+    expect(res.statusCode).toBe(400);
+  });
+});
+
+// ── Dates ────────────────────────────────────────────────────────────────────
+describe('GET /api/dates', () => {
+  it('returns dates array with calUrl', async () => {
+    const res = await request(app).get('/api/dates');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.dates)).toBe(true);
+    res.body.dates.forEach(d => {
+      expect(d.event).toBeDefined();
+      expect(d.date).toBeDefined();
+      expect(d.calUrl).toContain('calendar.google.com');
+    });
+  });
+});
+
+// ── Announcements ────────────────────────────────────────────────────────────
+describe('GET /api/announcements', () => {
+  it('returns announcements array', async () => {
+    const res = await request(app).get('/api/announcements');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.announcements)).toBe(true);
+    expect(res.body.announcements.length).toBeGreaterThan(0);
+  });
+
+  it('each announcement has required fields', async () => {
+    const res = await request(app).get('/api/announcements');
+    res.body.announcements.forEach(a => {
+      expect(a.id).toBeDefined();
+      expect(a.text).toBeDefined();
+      expect(a.type).toBeDefined();
+    });
+  });
+});
+
+// ── Leaderboard ──────────────────────────────────────────────────────────────
+describe('GET /api/leaderboard', () => {
+  it('returns scores array (empty without Firestore)', async () => {
+    const res = await request(app).get('/api/leaderboard');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.scores)).toBe(true);
+  });
+});
+
+// ── Translate Validation ─────────────────────────────────────────────────────
+describe('POST /api/translate', () => {
+  it('returns 400 when text is missing', async () => {
+    const res = await request(app).post('/api/translate').send({ language: 'hindi' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when text is empty', async () => {
+    const res = await request(app).post('/api/translate').send({ text: '  ', language: 'hindi' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 for unsupported language', async () => {
+    const res = await request(app).post('/api/translate').send({ text: 'hello', language: 'klingon' });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toContain('Unsupported language');
+  });
+
+  it('returns 400 when text exceeds 1000 characters', async () => {
+    const res = await request(app).post('/api/translate').send({ text: 'a'.repeat(1001), language: 'hindi' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when text is not a string', async () => {
+    const res = await request(app).post('/api/translate').send({ text: 123, language: 'hindi' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns demo translation in demo mode (no API key)', async () => {
+    const res = await request(app).post('/api/translate')
+      .send({ text: 'How to vote', language: 'hindi' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.translated).toBeDefined();
+  });
+});
+
+// ── Chat Validation ───────────────────────────────────────────────────────────
+describe('POST /api/chat', () => {
+  it('returns 400 when message is missing', async () => {
+    const res = await request(app).post('/api/chat').send({});
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when message is empty', async () => {
+    const res = await request(app).post('/api/chat').send({ message: '  ' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when message exceeds 1000 chars', async () => {
+    const res = await request(app).post('/api/chat').send({ message: 'a'.repeat(1001) });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when message is not a string', async () => {
+    const res = await request(app).post('/api/chat').send({ message: 999 });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when history is not array', async () => {
+    const res = await request(app).post('/api/chat').send({ message: 'Hello', history: 'bad' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when history item has invalid role', async () => {
+    const res = await request(app).post('/api/chat')
+      .send({ message: 'Hello', history: [{ role: 'admin', text: 'hi' }] });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('accepts valid history entries', async () => {
+    const res = await request(app).post('/api/chat')
+      .send({ message: 'What is NOTA?', history: [{ role: 'user', text: 'hello' }, { role: 'model', text: 'hi' }] });
+    expect([200, 502]).toContain(res.statusCode);
+  });
+
+  it('returns demo reply in demo mode', async () => {
+    const res = await request(app).post('/api/chat').send({ message: 'How do I vote?' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.reply).toBeDefined();
+    expect(typeof res.body.reply).toBe('string');
+    expect(res.body.reply.length).toBeGreaterThan(0);
+  });
+});
+
+// ── Security Headers ──────────────────────────────────────────────────────────
+describe('Security headers', () => {
+  it('has X-Content-Type-Options', async () => {
+    const res = await request(app).get('/api/health');
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+  });
+
+  it('has X-Frame-Options', async () => {
+    const res = await request(app).get('/api/health');
+    expect(res.headers['x-frame-options']).toBeDefined();
+  });
+
+  it('has Content-Security-Policy', async () => {
+    const res = await request(app).get('/api/health');
+    expect(res.headers['content-security-policy']).toBeDefined();
+  });
+
+  it('responses are gzip compressed', async () => {
+    const res = await request(app).get('/api/election').set('Accept-Encoding', 'gzip');
+    expect(res.headers['content-encoding']).toBe('gzip');
+  });
+});
+
+// ── SPA Fallback ──────────────────────────────────────────────────────────────
+describe('SPA fallback', () => {
+  it('serves index.html for unknown routes', async () => {
+    const res = await request(app).get('/unknown-route');
+    expect(res.statusCode).toBe(200);
+    expect(res.headers['content-type']).toMatch(/html/);
+  });
+});

@@ -127,12 +127,13 @@ How this submission addresses each evaluation axis:
 
 ```
 VoteWiseIndia/
-├── server.js           # Express backend — full JSDoc, modular helpers
-├── server.test.js      # Jest + Supertest — 66 tests, 90%+ coverage
+├── server.js           # Express backend (987 lines) — full JSDoc, modular
+├── server.test.js      # Jest + Supertest — 66 tests across 13 describe blocks
 ├── public/
 │   └── index.html      # SPA frontend — bilingual, accessible, animated
-├── Dockerfile          # Cloud Run deployment
-├── package.json
+├── Dockerfile          # Cloud Run deployment (non-root, healthcheck)
+├── .dockerignore       # Keeps secrets & test files out of the image
+├── package.json        # Dependencies + scripts
 ├── .env.example        # Template — copy to .env and fill in
 ├── .gitignore          # Excludes .env, node_modules, coverage/
 └── README.md
@@ -151,8 +152,12 @@ cp .env.example .env
 npm start
 # → http://localhost:8080
 
-# Run the test suite (66 tests, ~7 s)
+# Run the test suite (66 tests)
 npm test
+
+# Or with Docker (mirrors Cloud Run)
+docker build -t votewise-india .
+docker run -p 8080:8080 --env-file .env votewise-india
 ```
 
 ---

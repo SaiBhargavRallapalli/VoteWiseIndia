@@ -971,13 +971,11 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Something went wrong.' });
 });
 
-let server;
-if (require.main === module) {
-  server = app.listen(PORT, () => {
-    console.log(`VoteWise India on http://localhost:${PORT}`);
-    console.log(`Gemini: ${process.env.GEMINI_API_KEY ? 'configured ✓' : 'demo mode'}`);
-    console.log(`Firestore: ${db ? 'connected ✓' : 'not configured'}`);
-  });
-}
+// ── Start Server ──────────────────────────────────────────────────────────────
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`VoteWise India on http://localhost:${PORT}`);
+  console.log(`Gemini: ${process.env.GEMINI_API_KEY ? 'configured ✓' : 'demo mode'}`);
+  console.log(`Firestore: ${db ? 'connected ✓' : 'not configured'}`);
+});
 
 module.exports = { app, server, ELECTION_DATA };

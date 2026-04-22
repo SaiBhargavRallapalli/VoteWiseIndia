@@ -2,7 +2,7 @@ FROM node:20.19.4-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
-COPY . .
+COPY --chown=node:node . .
 EXPOSE 8080
 USER node
 CMD ["node", "server.js"]

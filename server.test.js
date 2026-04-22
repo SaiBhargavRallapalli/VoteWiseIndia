@@ -7,7 +7,9 @@
 'use strict';
 
 const request = require('supertest');
-const { app, ELECTION_DATA } = require('./server');
+const { app, server, ELECTION_DATA } = require('./server');
+
+afterAll(() => new Promise(resolve => server.close(resolve)));
 
 // ── Health ──────────────────────────────────────────────────────────────────
 describe('GET /api/health', () => {
@@ -270,10 +272,13 @@ describe('POST /api/translate', () => {
   });
 
   it('returns demo translation in demo mode (no API key)', async () => {
+    const originalKey = process.env.GEMINI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
     const res = await request(app).post('/api/translate')
       .send({ text: 'How to vote', language: 'hindi' });
     expect(res.statusCode).toBe(200);
     expect(res.body.translated).toBeDefined();
+    if (originalKey) process.env.GEMINI_API_KEY = originalKey;
   });
 });
 
@@ -317,11 +322,14 @@ describe('POST /api/chat', () => {
   });
 
   it('returns demo reply in demo mode', async () => {
+    const originalKey = process.env.GEMINI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
     const res = await request(app).post('/api/chat').send({ message: 'How do I vote?' });
     expect(res.statusCode).toBe(200);
     expect(res.body.reply).toBeDefined();
     expect(typeof res.body.reply).toBe('string');
     expect(res.body.reply.length).toBeGreaterThan(0);
+    if (originalKey) process.env.GEMINI_API_KEY = originalKey;
   });
 });
 

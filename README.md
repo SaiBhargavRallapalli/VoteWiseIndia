@@ -34,7 +34,7 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 
 ## What It Does
 
-- 🤖 **AI Assistant** — Ask anything about Indian elections in English or Hindi, powered by Google Gemini 2.0 Flash
+- 🤖 **AI Assistant** — Ask anything about Indian elections in English or Hindi, powered by Google Gemini (flash-latest)
 - 🗳️ **How to Vote** — 7-step interactive guide from checking registration to casting your vote
 - 📋 **Voter Registration** — 6-step guide with Form 6, document requirements, and official links
 - 🎯 **Election Quiz** — 10-question quiz with explanations; scores saved to Firestore leaderboard
@@ -80,7 +80,7 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 
 | Service | Integration Type | Usage |
 |---|---|---|
-| **Gemini 2.0 Flash** | AI chat (server-side proxy) | Bilingual election Q&A with full context |
+| **Gemini Flash (latest)** | AI chat (server-side proxy) | Bilingual election Q&A with full context |
 | **Gemini (Translation)** | API call | Translate content to 8 Indian languages |
 | **Firebase Firestore** | Admin SDK + client SDK | Quiz score persistence and leaderboard |
 | **Firebase Authentication** | Google Sign-In | User identity via `/api/config` |

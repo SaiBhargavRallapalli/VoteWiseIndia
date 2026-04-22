@@ -9,7 +9,7 @@
 const request = require('supertest');
 const { app, server, ELECTION_DATA } = require('./server');
 
-afterAll(() => new Promise(resolve => server.close(resolve)));
+afterAll(() => new Promise(resolve => server ? server.close(resolve) : resolve()));
 
 // ── Health ──────────────────────────────────────────────────────────────────
 describe('GET /api/health', () => {

@@ -548,15 +548,23 @@
       transition: all 0.15s;
     }
 
-    .quiz-option:hover:not(:disabled) {
+    .quiz-option:hover {
       border-color: var(--saffron);
       background: var(--saffron-lt);
+    }
+
+    .quiz-option.selected {
+      border-color: var(--saffron);
+      background: var(--saffron-lt);
+      color: var(--saffron);
+      font-weight: 700;
     }
 
     .quiz-option.correct {
       border-color: var(--green);
       background: var(--green-lt);
       color: #4CAF50;
+      font-weight: 700;
     }
 
     .quiz-option.wrong {
@@ -565,25 +573,44 @@
       color: #ef5350;
     }
 
-    .quiz-option:disabled {
-      cursor: not-allowed;
+    .quiz-option.dimmed {
+      opacity: 0.45;
     }
 
-    .quiz-explain {
-      background: var(--bg-3);
-      border-left: 3px solid var(--gold);
+    .quiz-review {
+      margin-top: 1.5rem;
+      text-align: left;
+    }
+
+    .review-item {
+      border-left: 3px solid var(--border);
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
       border-radius: 0 var(--r-sm) var(--r-sm) 0;
-      padding: 0.8rem 1rem;
-      font-size: 0.82rem;
-      color: var(--text-2);
-      margin-top: 0.75rem;
-      line-height: 1.6;
-      display: none;
+      background: var(--bg-2);
     }
 
-    .quiz-explain.visible {
-      display: block;
-      animation: fadeIn 0.2s ease;
+    .review-item.review-correct { border-left-color: var(--green); }
+    .review-item.review-wrong { border-left-color: #ef5350; }
+
+    .review-q {
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+
+    .review-a {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      margin-bottom: 0.35rem;
+    }
+
+    .review-explain {
+      font-size: 0.78rem;
+      color: var(--text-3);
+      line-height: 1.5;
+      font-style: italic;
     }
 
     .quiz-nav {
@@ -2306,8 +2333,7 @@
     let quizLoaded = false;
     let questions = [];
     let currentQ = 0;
-    let answers = [];
-    let answered = false;
+    let selectedAnswers = [];
     const SESSION_ID = Math.random().toString(36).slice(2);
 
     async function initQuiz() {
@@ -2316,6 +2342,7 @@
         const res = await fetch('/api/quiz');
         const data = await res.json();
         questions = data.questions;
+        selectedAnswers = new Array(questions.length).fill(-1);
         quizLoaded = true;
         renderQuestion();
       } catch (e) {
@@ -2325,8 +2352,9 @@
 
     function renderQuestion() {
       const q = questions[currentQ];
-      const pct = Math.round(((currentQ) / questions.length) * 100);
+      const pct = Math.round((currentQ / questions.length) * 100);
       const container = document.getElementById('quiz-container');
+      const sel = selectedAnswers[currentQ];
 
       container.innerHTML = `
         <div class="quiz-progress">
@@ -2338,64 +2366,34 @@
         <div class="quiz-question" id="q-text">${escHtml(q.q)}</div>
         <div class="quiz-options" role="group" aria-labelledby="q-text">
           ${q.options.map((opt, i) => `
-            <button class="quiz-option" data-index="${i}" onclick="selectAnswer(${i})"
-              aria-label="Option ${i + 1}: ${escHtml(opt)}">
+            <button class="quiz-option${sel === i ? ' selected' : sel !== -1 ? ' dimmed' : ''}"
+              data-index="${i}" onclick="selectAnswer(${i})"
+              aria-label="Option ${i + 1}: ${escHtml(opt)}"
+              aria-pressed="${sel === i}">
               ${String.fromCharCode(65 + i)}. ${escHtml(opt)}
             </button>
           `).join('')}
         </div>
-        <div class="quiz-explain" id="quiz-explain" aria-live="polite"></div>
         <div class="quiz-nav">
           <span style="font-family:var(--font-m);font-size:0.75rem;color:var(--text-3);">
-            Score: ${answers.filter(a => a.correct).length}/${currentQ}
+            ${sel !== -1 ? '✓ Answer saved — click Next' : 'Select an answer'}
           </span>
-          <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled aria-label="Next question">
-            ${currentQ === questions.length - 1 ? 'See Results' : 'Next →'}
+          <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()"
+            ${sel === -1 ? 'disabled' : ''}
+            aria-label="${currentQ === questions.length - 1 ? 'See results' : 'Next question'}">
+            ${currentQ === questions.length - 1 ? 'See Results →' : 'Next →'}
           </button>
         </div>
       `;
-      answered = false;
     }
 
     function selectAnswer(idx) {
-      if (answered) return;
-      answered = true;
-
-      const opts = document.querySelectorAll('.quiz-option');
-      opts.forEach(o => o.disabled = true);
-
-      // Fetch correct answer from server
-      fetch('/api/quiz/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          answers: [...new Array(currentQ).fill(0), idx, ...new Array(questions.length - currentQ - 1).fill(0)],
-          sessionId: SESSION_ID,
-        }),
-      }).then(r => r.json()).then(data => {
-        const result = data.results[currentQ];
-        const correct = result.correct;
-        const isRight = idx === correct;
-
-        opts[idx].classList.add(isRight ? 'correct' : 'wrong');
-        if (!isRight) opts[correct].classList.add('correct');
-
-        answers.push({ idx, correct, isCorrect: isRight });
-
-        const explainEl = document.getElementById('quiz-explain');
-        explainEl.textContent = result.explain;
-        explainEl.classList.add('visible');
-
-        document.getElementById('next-btn').disabled = false;
-
-        if (typeof gtag !== 'undefined') gtag('event', 'quiz_answer', { correct: isRight });
-      }).catch(() => {
-        answers.push({ idx, correct: 0, isCorrect: false });
-        document.getElementById('next-btn').disabled = false;
-      });
+      selectedAnswers[currentQ] = idx;
+      renderQuestion();
     }
 
     function nextQuestion() {
+      if (selectedAnswers[currentQ] === -1) return;
       currentQ++;
       if (currentQ >= questions.length) {
         showResults();
@@ -2404,38 +2402,61 @@
       }
     }
 
-    function showResults() {
-      const score = answers.filter(a => a.isCorrect).length;
-      const total = questions.length;
-      const pct = Math.round((score / total) * 100);
-      const badge = pct >= 80 ? ['🏆 Election Expert!', '#FFD700', 'rgba(255,215,0,0.15)']
-        : pct >= 60 ? ['👍 Good Knowledge!', '#138808', 'rgba(19,136,8,0.15)']
-          : ['📚 Keep Learning!', '#FF6B00', 'rgba(255,107,0,0.15)'];
+    async function showResults() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '<div class="loading-state">Calculating your results…</div>';
 
-      document.getElementById('quiz-container').innerHTML = `
-        <div class="quiz-result">
-          <div class="result-score">${score}/${total}</div>
-          <div class="result-label">You scored ${pct}%</div>
-          <div class="result-badge" style="background:${badge[2]};color:${badge[1]};border:1px solid ${badge[1]};">${badge[0]}</div>
-          <div style="margin-bottom:1.5rem;font-size:0.85rem;color:var(--text-2);">
-            ${pct >= 80 ? "Excellent! You have a strong understanding of Indian democracy." :
-          pct >= 60 ? "Good effort! Review the How to Vote section to learn more." :
-            "Keep learning! Explore the AI Assistant to get answers about elections."}
+      try {
+        const res = await fetch('/api/quiz/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers: selectedAnswers, sessionId: SESSION_ID }),
+        });
+        const data = await res.json();
+
+        const score = data.score;
+        const total = data.total;
+        const pct = data.percentage;
+        const badge = pct >= 80 ? ['🏆 Election Expert!', '#FFD700', 'rgba(255,215,0,0.15)']
+          : pct >= 60 ? ['👍 Good Knowledge!', '#138808', 'rgba(19,136,8,0.15)']
+            : ['📚 Keep Learning!', '#FF6B00', 'rgba(255,107,0,0.15)'];
+
+        container.innerHTML = `
+          <div class="quiz-result">
+            <div class="result-score">${score}/${total}</div>
+            <div class="result-label">You scored ${pct}%</div>
+            <div class="result-badge" style="background:${badge[2]};color:${badge[1]};border:1px solid ${badge[1]};">${badge[0]}</div>
+            <div class="quiz-review">
+              ${data.results.map((r, i) => `
+                <div class="review-item ${r.isCorrect ? 'review-correct' : 'review-wrong'}">
+                  <div class="review-q">${i + 1}. ${escHtml(r.question)}</div>
+                  <div class="review-a">
+                    ${r.isCorrect ? '✅ Correct' : '❌ Wrong'} —
+                    Your answer: <strong>${escHtml(questions[i].options[r.yourAnswer])}</strong>
+                    ${!r.isCorrect ? ` · Correct: <strong>${escHtml(questions[i].options[r.correct])}</strong>` : ''}
+                  </div>
+                  <div class="review-explain">${escHtml(r.explain)}</div>
+                </div>
+              `).join('')}
+            </div>
+            <button class="btn btn-primary" onclick="retakeQuiz()" style="margin-top:1.5rem;" aria-label="Retake quiz">🔄 Retake Quiz</button>
           </div>
-          <button class="btn btn-primary" onclick="retakeQuiz()" aria-label="Retake quiz">🔄 Retake Quiz</button>
-        </div>
-      `;
+        `;
 
-      // Save final score to Firestore
-      fetch('/api/quiz/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers: answers.map(a => a.idx), sessionId: SESSION_ID }),
-      }).catch(() => { });
+        if (typeof gtag !== 'undefined') gtag('event', 'quiz_complete', { score: pct });
+      } catch (e) {
+        container.innerHTML = `
+          <div class="quiz-result">
+            <div class="result-label">Quiz complete!</div>
+            <button class="btn btn-primary" onclick="retakeQuiz()" style="margin-top:1rem;">🔄 Retake Quiz</button>
+          </div>
+        `;
+      }
     }
 
     function retakeQuiz() {
-      currentQ = 0; answers = []; answered = false;
+      currentQ = 0;
+      selectedAnswers = new Array(questions.length).fill(-1);
       renderQuestion();
     }
 

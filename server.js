@@ -767,7 +767,9 @@ app.post('/api/quiz/submit', apiLimiter, async (req, res) => {
   const total = results.length;
   const sid = typeof sessionId === 'string' ? sessionId.slice(0, 64) : 'anonymous';
 
-  await saveQuizScore(sid, score, total);
+  if (!answers.includes(-1)) {
+    await saveQuizScore(sid, score, total);
+  }
 
   res.json({ score, total, percentage: Math.round((score / total) * 100), results });
 });
@@ -973,11 +975,13 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Something went wrong.' });
 });
 
-// ── Start Server ──────────────────────────────────────────────────────────────
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`VoteWise India on http://localhost:${PORT}`);
-  console.log(`Gemini: ${process.env.GEMINI_API_KEY ? 'configured ✓' : 'demo mode'}`);
-  console.log(`Firestore: ${db ? 'connected ✓' : 'not configured'}`);
-});
+let server;
+if (process.env.NODE_ENV !== 'test') {
+  server = app.listen(PORT, () => {
+    console.log(`VoteWise India on http://localhost:${PORT}`);
+    console.log(`Gemini: ${process.env.GEMINI_API_KEY ? 'configured ✓' : 'demo mode'}`);
+    console.log(`Firestore: ${db ? 'connected ✓' : 'not configured'}`);
+  });
+}
 
 module.exports = { app, server, ELECTION_DATA };

@@ -851,7 +851,7 @@ app.get('/api/president', apiLimiter, (_req, res) => {
  * @desc   Translates election-related text to Indian regional languages
  *         using Gemini API
  */
-app.post('/api/translate', apiLimiter, async (req, res) => {
+app.post('/api/translate', chatLimiter, async (req, res) => {
   const SUPPORTED = ['hindi', 'tamil', 'telugu', 'kannada', 'marathi', 'bengali', 'gujarati', 'punjabi'];
   const { text, language } = req.body;
 

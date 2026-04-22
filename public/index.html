@@ -298,15 +298,7 @@
       pointer-events: none;
     }
 
-    .hero::after {
-      content: '🇮🇳';
-      position: absolute;
-      bottom: 1.5rem;
-      right: 2rem;
-      font-size: 4rem;
-      opacity: 0.12;
-      pointer-events: none;
-    }
+    /* The 🇮🇳 is replaced by the rotating Ashoka Chakra (.chakra) */
 
     .hero-tag {
       display: inline-flex;
@@ -1235,6 +1227,343 @@
         grid-template-columns: 48px 1fr;
       }
     }
+
+    /* ═══════════════════════════════════════════════════════════
+       MOTION & MICRO-INTERACTIONS
+       All animations respect prefers-reduced-motion (see bottom).
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── Ashoka Chakra — decorative, rotates slowly in the hero ── */
+    .chakra {
+      position: absolute;
+      bottom: -30px;
+      right: -30px;
+      width: 260px;
+      height: 260px;
+      opacity: 0.09;
+      pointer-events: none;
+      animation: chakra-spin 80s linear infinite;
+    }
+
+    .chakra svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @keyframes chakra-spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── Hero title staggered entrance ─────────────────────────── */
+    .hero-tag {
+      opacity: 0;
+      animation: hero-fade 0.5s ease-out 0.05s forwards;
+    }
+
+    .hero h1 {
+      opacity: 0;
+      animation: hero-fade 0.6s ease-out 0.2s forwards;
+    }
+
+    .hero-sub {
+      opacity: 0;
+      animation: hero-fade 0.6s ease-out 0.4s forwards;
+    }
+
+    @keyframes hero-fade {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Logo idle glow ────────────────────────────────────────── */
+    .logo-icon {
+      animation: logo-glow 4s ease-in-out infinite;
+    }
+
+    @keyframes logo-glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 20px rgba(255, 107, 0, 0.2);
+      }
+
+      50% {
+        box-shadow: 0 0 32px rgba(255, 107, 0, 0.5);
+      }
+    }
+
+    /* ── Nav active indicator: wipe-in underline ───────────────── */
+    .nav-btn {
+      position: relative;
+    }
+
+    .nav-btn.active {
+      border-bottom-color: transparent;
+    }
+
+    .nav-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--saffron), var(--gold));
+      border-radius: 2px 2px 0 0;
+      animation: nav-slide 0.3s ease-out;
+    }
+
+    @keyframes nav-slide {
+      from {
+        left: 50%;
+        right: 50%;
+        opacity: 0;
+      }
+
+      to {
+        left: 10%;
+        right: 10%;
+        opacity: 1;
+      }
+    }
+
+    /* ── Scroll-reveal cards (facts, election types, steps, dates) */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Fact card: saffron shimmer on hover ───────────────────── */
+    .fact-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fact-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 107, 0, 0.1),
+          transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .fact-card:hover::before {
+      left: 100%;
+    }
+
+    /* ── Type card: animated border gradient on hover ──────────── */
+    .type-card {
+      position: relative;
+    }
+
+    .type-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--saffron), transparent 40%, transparent 60%, var(--green));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .type-card:hover::after {
+      opacity: 1;
+    }
+
+    /* ── Progress bar: moving shine ────────────────────────────── */
+    .progress-fill {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent);
+      animation: progress-shine 2s ease-in-out infinite;
+    }
+
+    @keyframes progress-shine {
+      to {
+        left: 150%;
+      }
+    }
+
+    /* ── Quiz options: stagger-reveal on question change ───────── */
+    .quiz-option {
+      animation: option-rise 0.35s ease-out both;
+    }
+
+    .quiz-option:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .quiz-option:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+    .quiz-option:nth-child(3) {
+      animation-delay: 0.19s;
+    }
+
+    .quiz-option:nth-child(4) {
+      animation-delay: 0.26s;
+    }
+
+    @keyframes option-rise {
+      from {
+        opacity: 0;
+        transform: translateX(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* ── Button press feedback ─────────────────────────────────── */
+    .btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(255, 107, 0, 0.35);
+    }
+
+    /* ── Step card enhanced hover ──────────────────────────────── */
+    .step-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 107, 0, 0.08), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .step-card:hover::before {
+      opacity: 1;
+    }
+
+    .step-num {
+      transition: transform 0.3s ease;
+    }
+
+    .step-card:hover .step-num {
+      transform: scale(1.08) rotate(-5deg);
+    }
+
+    /* ── Accessibility: visible focus indicator for keyboard users
+       (WCAG 2.4.7). :focus-visible only triggers for keyboard focus,
+       not mouse clicks — so it doesn't pollute the UI for mouse users. */
+    *:focus {
+      outline: none;
+    }
+
+    *:focus-visible {
+      outline: 2px solid var(--saffron);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    .nav-btn:focus-visible,
+    .quick-btn:focus-visible,
+    .filter-pill:focus-visible,
+    .quiz-option:focus-visible,
+    .btn:focus-visible,
+    #auth-btn:focus-visible,
+    #send-btn:focus-visible {
+      outline: 2px solid var(--saffron);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.15);
+    }
+
+    a:focus-visible {
+      outline: 2px solid var(--saffron);
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
+
+    #chat-input:focus-visible,
+    .translate-box textarea:focus-visible,
+    .translate-box select:focus-visible,
+    .lang-select:focus-visible {
+      outline: 2px solid var(--saffron);
+      outline-offset: 1px;
+      border-color: var(--saffron);
+    }
+
+    /* ── Accessibility: honour reduced-motion preference ───────── */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      .chakra {
+        animation: none;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
   </style>
 </head>
 
@@ -1280,6 +1609,30 @@
     <!-- HOME ─────────────────────────────────────────────────── -->
     <section class="panel active" id="panel-home" role="tabpanel" aria-label="Home">
       <div class="hero">
+        <div class="chakra" aria-hidden="true">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" stroke="#000080" stroke-width="1.2">
+              <circle cx="50" cy="50" r="48" />
+              <circle cx="50" cy="50" r="38" />
+              <circle cx="50" cy="50" r="6" fill="#000080" />
+              <!-- 24 spokes -->
+              <g>
+                <line x1="50" y1="2" x2="50" y2="98" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(15 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(30 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(45 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(60 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(75 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(90 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(105 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(120 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(135 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(150 50 50)" />
+                <line x1="50" y1="2" x2="50" y2="98" transform="rotate(165 50 50)" />
+              </g>
+            </g>
+          </svg>
+        </div>
         <div class="hero-tag">India's Democracy Guide</div>
         <h1>Your Vote,<br><span>Your Voice</span></h1>
         <p class="hero-sub">Understand Indian elections — from Lok Sabha to Panchayat — with AI-powered guidance. Know
@@ -1631,22 +1984,25 @@
         const res = await fetch('/api/election');
         const data = await res.json();
 
-        // Facts grid
-        document.getElementById('facts-grid').innerHTML = data.keyFacts.map(f => `
-          <div class="fact-card" role="listitem">
-            <div class="fact-val">${escHtml(f.value)}</div>
+        // Facts grid (reveal class + data-count for count-up animation)
+        document.getElementById('facts-grid').innerHTML = data.keyFacts.map((f, i) => `
+          <div class="fact-card reveal" role="listitem" style="transition-delay:${i * 70}ms">
+            <div class="fact-val" data-count="${escHtml(f.value)}">${escHtml(f.value)}</div>
             <div class="fact-lbl">${f.icon} ${escHtml(f.label)}</div>
           </div>
         `).join('');
 
         // Election types
-        document.getElementById('election-types').innerHTML = data.electionTypes.map(t => `
-          <div class="type-card" role="listitem">
+        document.getElementById('election-types').innerHTML = data.electionTypes.map((t, i) => `
+          <div class="type-card reveal" role="listitem" style="transition-delay:${i * 60}ms">
             <div class="type-name">${escHtml(t.name)}</div>
             <div class="type-desc">${escHtml(t.desc)}</div>
             <div class="type-meta">Frequency: ${escHtml(t.frequency)} · Next: ${escHtml(t.nextDue)}</div>
           </div>
         `).join('');
+
+        observeReveals();
+        animateCountUps();
       } catch (e) { console.error('loadHomeData:', e); }
     }
 
@@ -1661,7 +2017,7 @@
         stepsLoaded = true;
 
         document.getElementById('voting-steps').innerHTML = data.votingSteps.map(s => `
-          <article class="step-card" role="listitem" aria-label="Step ${s.step}: ${escHtml(s.title)}">
+          <article class="step-card reveal" role="listitem" aria-label="Step ${s.step}: ${escHtml(s.title)}" style="transition-delay:${s.step * 50}ms">
             <div>
               <div class="step-num" aria-hidden="true">${s.step}</div>
               <div class="step-icon" aria-hidden="true" style="margin-top:0.4rem;">${s.icon}</div>
@@ -1674,7 +2030,7 @@
         `).join('');
 
         document.getElementById('reg-steps').innerHTML = data.registrationSteps.map(s => `
-          <article class="step-card" role="listitem" aria-label="Step ${s.step}: ${escHtml(s.title)}">
+          <article class="step-card reveal" role="listitem" aria-label="Step ${s.step}: ${escHtml(s.title)}" style="transition-delay:${s.step * 50}ms">
             <div>
               <div class="step-num" aria-hidden="true">${s.step}</div>
             </div>
@@ -1684,7 +2040,78 @@
             </div>
           </article>
         `).join('');
+        observeReveals();
+        attachStepHoverTracking();
       } catch (e) { console.error('loadSteps:', e); }
+    }
+
+    /* ── Motion helpers: scroll-reveal, count-up, hover glow ──── */
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /**
+     * Observes .reveal elements and fades them in once they enter the viewport.
+     * Idempotent — safe to call after each async render.
+     */
+    const revealObserver = 'IntersectionObserver' in window
+      ? new IntersectionObserver((entries, obs) => {
+          entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+          });
+        }, { rootMargin: '0px 0px -40px 0px', threshold: 0.1 })
+      : null;
+
+    function observeReveals() {
+      if (prefersReducedMotion || !revealObserver) {
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+        return;
+      }
+      document.querySelectorAll('.reveal:not(.in)').forEach(el => revealObserver.observe(el));
+    }
+
+    /**
+     * Animates numeric fact values from 0 up to their target.
+     * Preserves suffixes (%, Cr, years, seats) and decimals. Skips under reduced-motion.
+     */
+    function animateCountUps() {
+      if (prefersReducedMotion) return;
+      document.querySelectorAll('.fact-val[data-count]').forEach(el => {
+        const raw = el.dataset.count;
+        const match = raw.match(/^([\d,.]+)(.*)$/);
+        if (!match) return;
+        const target = parseFloat(match[1].replace(/,/g, ''));
+        if (!isFinite(target) || target === 0) return;
+        const suffix = match[2];
+        const hasDecimal = match[1].includes('.');
+        const decimals = hasDecimal ? (match[1].split('.')[1] || '').length : 0;
+        const duration = 1200;
+        const start = performance.now();
+        el.textContent = '0' + suffix;
+
+        function tick(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const value = target * eased;
+          el.textContent = value.toFixed(decimals) + suffix;
+          if (t < 1) requestAnimationFrame(tick);
+          else el.textContent = raw;
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    /** Tracks pointer position on step cards for radial hover glow. */
+    function attachStepHoverTracking() {
+      if (prefersReducedMotion) return;
+      document.querySelectorAll('.step-card').forEach(card => {
+        if (card.dataset.hoverBound) return;
+        card.dataset.hoverBound = '1';
+        card.addEventListener('pointermove', e => {
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width) * 100 + '%');
+          card.style.setProperty('--my', ((e.clientY - rect.top) / rect.height) * 100 + '%');
+        });
+      });
     }
 
     /* ── Quiz Engine ─────────────────────────────────────────── */

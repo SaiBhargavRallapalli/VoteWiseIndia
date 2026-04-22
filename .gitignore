@@ -1,1 +1,20 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Environment (never commit real secrets)
+.env
+.env.local
+.env.*.local
+
+# Test coverage (generated)
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.swp

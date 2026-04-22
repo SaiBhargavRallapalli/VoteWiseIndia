@@ -23,7 +23,12 @@
 
 India has 96.8 crore eligible voters, many of them first-time voters, rural citizens, and non-English speakers. Existing ECI resources are exhaustive but scattered across dozens of PDFs and portals. VoteWise India consolidates that knowledge into a single, conversational, bilingual web app that meets citizens where they are.
 
-VoteWise India is a bilingual (English + Hindi) election education app for India:
+**Design philosophy:**
+1. **Single page, zero friction** — No signup required to learn. Optional Google Sign-In only for quiz leaderboard.
+2. **Bilingual by default** — Every interaction works in English and हिंदी; translation to 8 regional languages via Gemini.
+3. **Authoritative, not political** — Content is sourced from ECI / official references only. Never names parties or candidates.
+4. **Accessible** — WCAG 2.1 AA contrast, full keyboard navigation, `prefers-reduced-motion` respected, ARIA live regions, skip links.
+5. **Server-side secrets** — Gemini & Firestore credentials never leave the backend.
 
 ---
 

@@ -1236,11 +1236,12 @@
     /* ── Ashoka Chakra — decorative, rotates slowly in the hero ── */
     .chakra {
       position: absolute;
-      bottom: -30px;
-      right: -30px;
-      width: 260px;
-      height: 260px;
-      opacity: 0.09;
+      top: 50%;
+      right: 1.5rem;
+      transform: translateY(-50%);
+      width: 220px;
+      height: 220px;
+      opacity: 0.18;
       pointer-events: none;
       animation: chakra-spin 80s linear infinite;
     }
@@ -1430,29 +1431,18 @@
 
     /* ── Quiz options: stagger-reveal on question change ───────── */
     .quiz-option {
-      animation: option-rise 0.35s ease-out both;
+      animation: option-rise 0.3s ease-out forwards;
     }
 
-    .quiz-option:nth-child(1) {
-      animation-delay: 0.05s;
-    }
-
-    .quiz-option:nth-child(2) {
-      animation-delay: 0.12s;
-    }
-
-    .quiz-option:nth-child(3) {
-      animation-delay: 0.19s;
-    }
-
-    .quiz-option:nth-child(4) {
-      animation-delay: 0.26s;
-    }
+    .quiz-option:nth-child(1) { animation-delay: 0s; }
+    .quiz-option:nth-child(2) { animation-delay: 0.07s; }
+    .quiz-option:nth-child(3) { animation-delay: 0.14s; }
+    .quiz-option:nth-child(4) { animation-delay: 0.21s; }
 
     @keyframes option-rise {
       from {
-        opacity: 0;
-        transform: translateX(-8px);
+        opacity: 0.3;
+        transform: translateX(-6px);
       }
 
       to {
@@ -1501,6 +1491,189 @@
 
     .step-card:hover .step-num {
       transform: scale(1.08) rotate(-5deg);
+    }
+
+    /* ── Filter Pills ───────────────────────────────────────── */
+    .filter-pill {
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      font-size: 0.78rem;
+      font-family: var(--font-b);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--border-hi);
+      color: var(--text);
+    }
+
+    .filter-pill.active {
+      background: var(--saffron-lt);
+      border-color: var(--saffron);
+      color: var(--saffron);
+      font-weight: 600;
+    }
+
+    /* ── Parliament / President shared grid ─────────────────── */
+    .parl-grid,
+    .pres-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media(max-width: 768px) {
+      .parl-grid,
+      .pres-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .parl-card,
+    .pres-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+
+    .parl-card:hover,
+    .pres-card:hover {
+      border-color: var(--border-hi);
+    }
+
+    .parl-card h3,
+    .pres-card h3 {
+      font-family: var(--font-h);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--saffron);
+      margin-bottom: 0.9rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .parl-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.82rem;
+    }
+
+    .parl-stat:last-child {
+      border-bottom: none;
+    }
+
+    .parl-stat .label {
+      color: var(--text-3);
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+      padding-top: 2px;
+      min-width: 90px;
+    }
+
+    .parl-stat .value {
+      color: var(--text);
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .pres-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 0;
+    }
+
+    .pres-list li {
+      font-size: 0.82rem;
+      color: var(--text-2);
+      padding: 0.4rem 0 0.4rem 1.1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .pres-list li:last-child {
+      border-bottom: none;
+    }
+
+    .pres-list li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--saffron);
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    /* ── States Table ────────────────────────────────────────── */
+    .states-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      min-width: 640px;
+    }
+
+    .states-table th {
+      text-align: left;
+      padding: 0.65rem 0.8rem;
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-3);
+      border-bottom: 2px solid var(--border);
+      background: var(--bg-1);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      white-space: nowrap;
+    }
+
+    .states-table td {
+      padding: 0.55rem 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .states-table tbody tr:hover {
+      background: var(--bg-2);
+    }
+
+    .state-badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--r-sm);
+      font-family: var(--font-m);
+      font-size: 0.63rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-state {
+      background: var(--saffron-lt);
+      color: var(--saffron);
+      border: 1px solid rgba(255, 107, 0, 0.3);
+    }
+
+    .badge-ut {
+      background: var(--green-lt);
+      color: var(--green);
+      border: 1px solid rgba(19, 136, 8, 0.3);
     }
 
     /* ── Accessibility: visible focus indicator for keyboard users
@@ -1611,10 +1784,10 @@
       <div class="hero">
         <div class="chakra" aria-hidden="true">
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <g fill="none" stroke="#000080" stroke-width="1.2">
+            <g fill="none" stroke="#FF6B00" stroke-width="1.4">
               <circle cx="50" cy="50" r="48" />
               <circle cx="50" cy="50" r="38" />
-              <circle cx="50" cy="50" r="6" fill="#000080" />
+              <circle cx="50" cy="50" r="6" fill="#FF6B00" />
               <!-- 24 spokes -->
               <g>
                 <line x1="50" y1="2" x2="50" y2="98" />
@@ -1969,12 +2142,27 @@
     }
 
     function handleAuth() {
-      if (!auth) return;
+      if (!auth) {
+        const btn = document.getElementById('auth-btn');
+        btn.textContent = 'Sign-in unavailable';
+        setTimeout(() => { btn.textContent = currentLang === 'hi' ? 'Google से साइन इन करें' : 'Sign in with Google'; }, 2000);
+        return;
+      }
       if (auth.currentUser) {
         auth.signOut();
       } else {
         const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).catch(e => console.error('Auth:', e));
+        auth.signInWithPopup(provider).catch(e => {
+          console.error('Auth:', e);
+          const btn = document.getElementById('auth-btn');
+          const msg = e.code === 'auth/unauthorized-domain'
+            ? 'Domain not authorised in Firebase'
+            : e.code === 'auth/popup-blocked'
+            ? 'Allow pop-ups to sign in'
+            : 'Sign-in failed — try again';
+          btn.textContent = msg;
+          setTimeout(() => { btn.textContent = currentLang === 'hi' ? 'Google से साइन इन करें' : 'Sign in with Google'; }, 3000);
+        });
       }
     }
 
@@ -2567,6 +2755,103 @@
         `;
       } catch (e) { el.innerHTML = '<div class="error-state">Failed to load president data.</div>'; }
     }
+
+    /* ── i18n — bilingual UI (EN / HI) ──────────────────────── */
+    const I18N = {
+      en: {
+        nav: ['🏠 Home', '🗳️ How to Vote', '📋 Registration', '🎯 Quiz', '📍 ECI Map', '🤖 AI Assistant', '📅 Dates', '🏛️ Parliament', '🗺️ States & UTs', '🇮🇳 President', '🌐 Translate', '📢 Updates'],
+        heroTag: "India's Democracy Guide",
+        heroH1: 'Your Vote,<br><span>Your Voice</span>',
+        heroSub: 'Understand Indian elections — from Lok Sabha to Panchayat — with AI-powered guidance. Know your rights, register to vote, and participate in democracy.',
+        signIn: 'Sign in with Google',
+        chatPlaceholder: 'Ask about elections… / चुनाव के बारे में पूछें…',
+        secTitle_home: 'Types of Elections in India',
+        secTitle_vote: 'How to Vote — Step by Step',
+        secTitle_reg: 'How to Register as a Voter',
+        secTitle_quiz: 'Test Your Election Knowledge',
+        secTitle_map: 'Election Commission of India — HQ',
+        secTitle_chat: '',
+        secTitle_dates: 'Important Election Dates',
+        secTitle_parl: 'Parliament of India',
+        secTitle_states: 'States & Union Territories',
+        secTitle_pres: 'President & Vice President of India',
+        secTitle_translate: 'Translate Election Content',
+        secTitle_updates: 'ECI Updates & Announcements',
+      },
+      hi: {
+        nav: ['🏠 होम', '🗳️ मतदान कैसे करें', '📋 पंजीकरण', '🎯 क्विज़', '📍 ECI मानचित्र', '🤖 AI सहायक', '📅 तारीखें', '🏛️ संसद', '🗺️ राज्य और UTs', '🇮🇳 राष्ट्रपति', '🌐 अनुवाद', '📢 अपडेट'],
+        heroTag: 'भारत का लोकतंत्र गाइड',
+        heroH1: 'आपका वोट,<br><span>आपकी आवाज़</span>',
+        heroSub: 'लोक सभा से पंचायत तक भारतीय चुनावों को AI-संचालित मार्गदर्शन के साथ समझें। अपने अधिकार जानें, मतदाता पंजीकरण करें और लोकतंत्र में भाग लें।',
+        signIn: 'Google से साइन इन करें',
+        chatPlaceholder: 'चुनाव के बारे में पूछें…',
+        secTitle_home: 'भारत में चुनावों के प्रकार',
+        secTitle_vote: 'मतदान कैसे करें — चरण दर चरण',
+        secTitle_reg: 'मतदाता के रूप में पंजीकरण कैसे करें',
+        secTitle_quiz: 'अपने चुनाव ज्ञान का परीक्षण करें',
+        secTitle_map: 'भारत निर्वाचन आयोग — मुख्यालय',
+        secTitle_chat: '',
+        secTitle_dates: 'महत्वपूर्ण चुनाव तिथियाँ',
+        secTitle_parl: 'भारत की संसद',
+        secTitle_states: 'राज्य और केंद्र शासित प्रदेश',
+        secTitle_pres: 'भारत के राष्ट्रपति एवं उपराष्ट्रपति',
+        secTitle_translate: 'चुनाव सामग्री का अनुवाद',
+        secTitle_updates: 'ECI अपडेट और घोषणाएँ',
+      },
+    };
+
+    let currentLang = 'en';
+
+    function applyLang(lang) {
+      currentLang = lang;
+      const t = I18N[lang];
+      document.documentElement.lang = lang === 'hi' ? 'hi' : 'en';
+
+      // Nav buttons
+      document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+        if (t.nav[i]) btn.textContent = t.nav[i];
+      });
+
+      // Hero
+      const heroTag = document.querySelector('.hero-tag');
+      if (heroTag) heroTag.textContent = t.heroTag;
+      const heroH1 = document.querySelector('.hero h1');
+      if (heroH1) heroH1.innerHTML = t.heroH1;
+      const heroSub = document.querySelector('.hero-sub');
+      if (heroSub) heroSub.textContent = t.heroSub;
+
+      // Auth button
+      const authBtn = document.getElementById('auth-btn');
+      if (authBtn && !(auth && auth.currentUser)) authBtn.textContent = t.signIn;
+
+      // Chat placeholder
+      const chatIn = document.getElementById('chat-input');
+      if (chatIn) chatIn.placeholder = t.chatPlaceholder;
+
+      // Section titles (h2.section-title inside each panel)
+      const titleMap = {
+        'panel-home': t.secTitle_home,
+        'panel-how-to-vote': t.secTitle_vote,
+        'panel-register': t.secTitle_reg,
+        'panel-quiz': t.secTitle_quiz,
+        'panel-map': t.secTitle_map,
+        'panel-dates': t.secTitle_dates,
+        'panel-parliament': t.secTitle_parl,
+        'panel-states': t.secTitle_states,
+        'panel-president': t.secTitle_pres,
+        'panel-translate': t.secTitle_translate,
+        'panel-updates': t.secTitle_updates,
+      };
+      Object.entries(titleMap).forEach(([panelId, title]) => {
+        if (!title) return;
+        const panel = document.getElementById(panelId);
+        if (!panel) return;
+        const h2 = panel.querySelector('h2.section-title');
+        if (h2) h2.textContent = title;
+      });
+    }
+
+    document.getElementById('lang-select').addEventListener('change', e => applyLang(e.target.value));
 
     /* ── Init ────────────────────────────────────────────────── */
     initFirebase();

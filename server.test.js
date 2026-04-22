@@ -7,9 +7,7 @@
 'use strict';
 
 const request = require('supertest');
-const { app, server, ELECTION_DATA } = require('../server');
-
-afterAll(() => new Promise(resolve => server.close(resolve)));
+const { app, ELECTION_DATA } = require('./server');
 
 // ── Health ──────────────────────────────────────────────────────────────────
 describe('GET /api/health', () => {
@@ -86,7 +84,7 @@ describe('GET /api/election', () => {
 
   it('returns X-Cache header', async () => {
     const res = await request(app).get('/api/election');
-    expect(['HIT','MISS']).toContain(res.headers['x-cache']);
+    expect(['HIT', 'MISS']).toContain(res.headers['x-cache']);
   });
 
   it('second request returns cache HIT', async () => {
@@ -356,5 +354,125 @@ describe('SPA fallback', () => {
     const res = await request(app).get('/unknown-route');
     expect(res.statusCode).toBe(200);
     expect(res.headers['content-type']).toMatch(/html/);
+  });
+});
+
+// ── States & UTs ──────────────────────────────────────────────────────────────
+describe('GET /api/states', () => {
+  it('returns all 36 states and UTs', async () => {
+    const res = await request(app).get('/api/states');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.totalStates).toBe(28);
+    expect(res.body.totalUTs).toBe(8);
+    expect(res.body.total).toBe(36);
+  });
+
+  it('filters by type=state returns 28', async () => {
+    const res = await request(app).get('/api/states?type=state');
+    expect(res.body.states.every(s => s.type === 'state')).toBe(true);
+    expect(res.body.total).toBe(28);
+  });
+
+  it('filters by type=ut returns 8', async () => {
+    const res = await request(app).get('/api/states?type=ut');
+    expect(res.body.states.every(s => s.type === 'ut')).toBe(true);
+    expect(res.body.total).toBe(8);
+  });
+
+  it('each state has required electoral fields', async () => {
+    const res = await request(app).get('/api/states');
+    res.body.states.forEach(s => {
+      expect(s.name).toBeDefined();
+      expect(s.capital).toBeDefined();
+      expect(s.lokSabhaSeats).toBeDefined();
+      expect(s.rajyaSabhaSeats).toBeDefined();
+      expect(s.type).toBeDefined();
+      expect(s.region).toBeDefined();
+    });
+  });
+
+  it('sets Cache-Control header', async () => {
+    const res = await request(app).get('/api/states');
+    expect(res.headers['cache-control']).toContain('max-age=3600');
+  });
+
+  it('UP has 80 Lok Sabha seats', async () => {
+    const res = await request(app).get('/api/states?type=state');
+    const up = res.body.states.find(s => s.name === 'Uttar Pradesh');
+    expect(up.lokSabhaSeats).toBe(80);
+  });
+});
+
+// ── Parliament ────────────────────────────────────────────────────────────────
+describe('GET /api/parliament', () => {
+  it('returns lokSabha and rajyaSabha objects', async () => {
+    const res = await request(app).get('/api/parliament');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.lokSabha).toBeDefined();
+    expect(res.body.rajyaSabha).toBeDefined();
+  });
+
+  it('Lok Sabha has 543 seats', async () => {
+    const res = await request(app).get('/api/parliament');
+    expect(res.body.lokSabha.totalSeats).toBe(543);
+  });
+
+  it('Rajya Sabha has 245 seats', async () => {
+    const res = await request(app).get('/api/parliament');
+    expect(res.body.rajyaSabha.totalSeats).toBe(245);
+  });
+
+  it('Rajya Sabha is permanent (never dissolved)', async () => {
+    const res = await request(app).get('/api/parliament');
+    expect(res.body.rajyaSabha.isPermanent).toBe(true);
+  });
+
+  it('Lok Sabha has keyFunctions array', async () => {
+    const res = await request(app).get('/api/parliament');
+    expect(Array.isArray(res.body.lokSabha.keyFunctions)).toBe(true);
+    expect(res.body.lokSabha.keyFunctions.length).toBeGreaterThan(0);
+  });
+
+  it('sets Cache-Control header', async () => {
+    const res = await request(app).get('/api/parliament');
+    expect(res.headers['cache-control']).toContain('max-age=3600');
+  });
+});
+
+// ── President ─────────────────────────────────────────────────────────────────
+describe('GET /api/president', () => {
+  it('returns president data', async () => {
+    const res = await request(app).get('/api/president');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.title).toBe('President of India');
+    expect(res.body.currentPresident).toBeDefined();
+  });
+
+  it('has 5-year term', async () => {
+    const res = await request(app).get('/api/president');
+    expect(res.body.term).toBe('5 years');
+  });
+
+  it('has election process steps', async () => {
+    const res = await request(app).get('/api/president');
+    expect(Array.isArray(res.body.process)).toBe(true);
+    expect(res.body.process.length).toBe(5);
+  });
+
+  it('has eligibility criteria', async () => {
+    const res = await request(app).get('/api/president');
+    expect(Array.isArray(res.body.eligibility)).toBe(true);
+    expect(res.body.eligibility.length).toBeGreaterThan(0);
+  });
+
+  it('has vice president details', async () => {
+    const res = await request(app).get('/api/president');
+    expect(res.body.vicePresident).toBeDefined();
+    expect(res.body.vicePresident.term).toBe('5 years');
+  });
+
+  it('sets Cache-Control header', async () => {
+    const res = await request(app).get('/api/president');
+    expect(res.headers['cache-control']).toContain('max-age=3600');
   });
 });

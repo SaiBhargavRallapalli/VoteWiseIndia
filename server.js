@@ -8,13 +8,13 @@
 
 'use strict';
 
-const express    = require('express');
-const cors       = require('cors');
-const helmet     = require('helmet');
-const compress   = require('compression');
-const rateLimit  = require('express-rate-limit');
-const path       = require('path');
-const admin      = require('firebase-admin');
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const compress = require('compression');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
+const admin = require('firebase-admin');
 require('dotenv').config();
 
 // ── Firebase Admin initialisation ────────────────────────────────────────────
@@ -27,7 +27,7 @@ try {
   console.warn('Firebase Firestore: running without persistence —', e.message);
 }
 
-const app  = express();
+const app = express();
 const PORT = process.env.PORT || 8080;
 
 // ── Security & Middleware ─────────────────────────────────────────────────────
@@ -37,21 +37,21 @@ app.use(compress());
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc:  ["'self'"],
-      scriptSrc:   ["'self'", "'unsafe-inline'",
-                    'https://www.gstatic.com',
-                    'https://www.googletagmanager.com',
-                    'https://www.google-analytics.com'],
-      styleSrc:    ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-      fontSrc:     ["'self'", 'https://fonts.gstatic.com'],
-      frameSrc:    ['https://www.google.com'],
-      connectSrc:  ["'self'",
-                    'https://identitytoolkit.googleapis.com',
-                    'https://firestore.googleapis.com',
-                    'https://www.google-analytics.com',
-                    'https://firebaseapp.com',
-                    'https://*.firebaseio.com'],
-      imgSrc:      ["'self'", 'data:', 'https:'],
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'",
+        'https://www.gstatic.com',
+        'https://www.googletagmanager.com',
+        'https://www.google-analytics.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      frameSrc: ['https://www.google.com'],
+      connectSrc: ["'self'",
+        'https://identitytoolkit.googleapis.com',
+        'https://firestore.googleapis.com',
+        'https://www.google-analytics.com',
+        'https://firebaseapp.com',
+        'https://*.firebaseio.com'],
+      imgSrc: ["'self'", 'data:', 'https:'],
     },
   },
 }));
@@ -123,67 +123,67 @@ function setCache(key, data) {
 
 /** Core election data for India */
 const ELECTION_DATA = {
-  title:    'Indian Elections',
+  title: 'Indian Elections',
   subtitle: 'Lok Sabha, Vidhan Sabha & Local Body Elections',
-  country:  'India',
-  body:     'Election Commission of India (ECI)',
-  website:  'https://eci.gov.in',
+  country: 'India',
+  body: 'Election Commission of India (ECI)',
+  website: 'https://eci.gov.in',
 
   keyFacts: [
-    { label: 'Eligible Voters',   value: '96.8 Crore', icon: '👥' },
-    { label: 'Lok Sabha Seats',   value: '543',         icon: '🏛️' },
-    { label: 'Polling Stations',  value: '10.5 Lakh',   icon: '🗳️' },
+    { label: 'Eligible Voters', value: '96.8 Crore', icon: '👥' },
+    { label: 'Lok Sabha Seats', value: '543', icon: '🏛️' },
+    { label: 'Polling Stations', value: '10.5 Lakh', icon: '🗳️' },
     { label: 'Recognised Parties', value: '6 National + 57 State', icon: '🎌' },
   ],
 
   electionTypes: [
     {
-      id:   'lok-sabha',
+      id: 'lok-sabha',
       name: 'Lok Sabha',
       full: 'General Elections (Lok Sabha)',
       desc: 'Election to the Lower House of Parliament. 543 constituencies across India. Held every 5 years.',
       frequency: 'Every 5 years',
       seats: 543,
       lastHeld: '2024',
-      nextDue:  '2029',
+      nextDue: '2029',
       calStart: '20290401T000000Z',
-      calEnd:   '20290601T000000Z',
+      calEnd: '20290601T000000Z',
     },
     {
-      id:   'rajya-sabha',
+      id: 'rajya-sabha',
       name: 'Rajya Sabha',
       full: 'Rajya Sabha Elections',
       desc: 'Upper House elections. Members elected by state legislative assemblies for 6-year terms. One-third retire every 2 years.',
       frequency: 'Biennial (one-third)',
       seats: 245,
       lastHeld: '2024',
-      nextDue:  '2026',
+      nextDue: '2026',
       calStart: '20260301T000000Z',
-      calEnd:   '20260401T000000Z',
+      calEnd: '20260401T000000Z',
     },
     {
-      id:   'vidhan-sabha',
+      id: 'vidhan-sabha',
       name: 'Vidhan Sabha',
       full: 'State Legislative Assembly Elections',
       desc: 'Elections to state assemblies. Each of the 28 states and 3 UTs with legislature holds separate elections.',
       frequency: 'Every 5 years (state-specific)',
       seats: 'Varies by state',
       lastHeld: '2024 (multiple states)',
-      nextDue:  '2025-2027 (state-specific)',
+      nextDue: '2025-2027 (state-specific)',
       calStart: '20251001T000000Z',
-      calEnd:   '20260101T000000Z',
+      calEnd: '20260101T000000Z',
     },
     {
-      id:   'local-body',
+      id: 'local-body',
       name: 'Local Body',
       full: 'Panchayat & Municipal Elections',
       desc: 'Elections for gram panchayats, municipal corporations, and local governing bodies. Conducted by State Election Commissions.',
       frequency: 'Every 5 years',
       seats: 'Varies',
       lastHeld: '2023-2024',
-      nextDue:  '2028-2029',
+      nextDue: '2028-2029',
       calStart: '20280101T000000Z',
-      calEnd:   '20280401T000000Z',
+      calEnd: '20280401T000000Z',
     },
   ],
 
@@ -349,6 +349,164 @@ const ELECTION_DATA = {
   ],
 };
 
+// ── Constitutional Bodies Data ────────────────────────────────────────────────
+
+/**
+ * @typedef {Object} StateInfo
+ * @property {string} name        - State or UT name
+ * @property {string} capital     - Capital city
+ * @property {number|string} vidhanSabhaSeats - Seats in state legislature
+ * @property {number} rajyaSabhaSeats - Seats in Rajya Sabha
+ * @property {number} lokSabhaSeats   - Seats in Lok Sabha
+ * @property {string} type        - 'state' or 'ut'
+ * @property {string} region      - Geographic region
+ */
+
+/** All 28 Indian states with electoral data */
+const STATES = [
+  { name: 'Andhra Pradesh', capital: 'Amaravati', vidhanSabhaSeats: 175, rajyaSabhaSeats: 11, lokSabhaSeats: 25, type: 'state', region: 'South' },
+  { name: 'Arunachal Pradesh', capital: 'Itanagar', vidhanSabhaSeats: 60, rajyaSabhaSeats: 1, lokSabhaSeats: 2, type: 'state', region: 'North East' },
+  { name: 'Assam', capital: 'Dispur', vidhanSabhaSeats: 126, rajyaSabhaSeats: 7, lokSabhaSeats: 14, type: 'state', region: 'North East' },
+  { name: 'Bihar', capital: 'Patna', vidhanSabhaSeats: 243, rajyaSabhaSeats: 16, lokSabhaSeats: 40, type: 'state', region: 'East' },
+  { name: 'Chhattisgarh', capital: 'Raipur', vidhanSabhaSeats: 90, rajyaSabhaSeats: 5, lokSabhaSeats: 11, type: 'state', region: 'Central' },
+  { name: 'Goa', capital: 'Panaji', vidhanSabhaSeats: 40, rajyaSabhaSeats: 1, lokSabhaSeats: 2, type: 'state', region: 'West' },
+  { name: 'Gujarat', capital: 'Gandhinagar', vidhanSabhaSeats: 182, rajyaSabhaSeats: 11, lokSabhaSeats: 26, type: 'state', region: 'West' },
+  { name: 'Haryana', capital: 'Chandigarh', vidhanSabhaSeats: 90, rajyaSabhaSeats: 5, lokSabhaSeats: 10, type: 'state', region: 'North' },
+  { name: 'Himachal Pradesh', capital: 'Shimla', vidhanSabhaSeats: 68, rajyaSabhaSeats: 3, lokSabhaSeats: 4, type: 'state', region: 'North' },
+  { name: 'Jharkhand', capital: 'Ranchi', vidhanSabhaSeats: 81, rajyaSabhaSeats: 6, lokSabhaSeats: 14, type: 'state', region: 'East' },
+  { name: 'Karnataka', capital: 'Bengaluru', vidhanSabhaSeats: 224, rajyaSabhaSeats: 12, lokSabhaSeats: 28, type: 'state', region: 'South' },
+  { name: 'Kerala', capital: 'Thiruvananthapuram', vidhanSabhaSeats: 140, rajyaSabhaSeats: 9, lokSabhaSeats: 20, type: 'state', region: 'South' },
+  { name: 'Madhya Pradesh', capital: 'Bhopal', vidhanSabhaSeats: 230, rajyaSabhaSeats: 11, lokSabhaSeats: 29, type: 'state', region: 'Central' },
+  { name: 'Maharashtra', capital: 'Mumbai', vidhanSabhaSeats: 288, rajyaSabhaSeats: 19, lokSabhaSeats: 48, type: 'state', region: 'West' },
+  { name: 'Manipur', capital: 'Imphal', vidhanSabhaSeats: 60, rajyaSabhaSeats: 1, lokSabhaSeats: 2, type: 'state', region: 'North East' },
+  { name: 'Meghalaya', capital: 'Shillong', vidhanSabhaSeats: 60, rajyaSabhaSeats: 1, lokSabhaSeats: 2, type: 'state', region: 'North East' },
+  { name: 'Mizoram', capital: 'Aizawl', vidhanSabhaSeats: 40, rajyaSabhaSeats: 1, lokSabhaSeats: 1, type: 'state', region: 'North East' },
+  { name: 'Nagaland', capital: 'Kohima', vidhanSabhaSeats: 60, rajyaSabhaSeats: 1, lokSabhaSeats: 1, type: 'state', region: 'North East' },
+  { name: 'Odisha', capital: 'Bhubaneswar', vidhanSabhaSeats: 147, rajyaSabhaSeats: 10, lokSabhaSeats: 21, type: 'state', region: 'East' },
+  { name: 'Punjab', capital: 'Chandigarh', vidhanSabhaSeats: 117, rajyaSabhaSeats: 7, lokSabhaSeats: 13, type: 'state', region: 'North' },
+  { name: 'Rajasthan', capital: 'Jaipur', vidhanSabhaSeats: 200, rajyaSabhaSeats: 10, lokSabhaSeats: 25, type: 'state', region: 'North' },
+  { name: 'Sikkim', capital: 'Gangtok', vidhanSabhaSeats: 32, rajyaSabhaSeats: 1, lokSabhaSeats: 1, type: 'state', region: 'North East' },
+  { name: 'Tamil Nadu', capital: 'Chennai', vidhanSabhaSeats: 234, rajyaSabhaSeats: 18, lokSabhaSeats: 39, type: 'state', region: 'South' },
+  { name: 'Telangana', capital: 'Hyderabad', vidhanSabhaSeats: 119, rajyaSabhaSeats: 7, lokSabhaSeats: 17, type: 'state', region: 'South' },
+  { name: 'Tripura', capital: 'Agartala', vidhanSabhaSeats: 60, rajyaSabhaSeats: 1, lokSabhaSeats: 2, type: 'state', region: 'North East' },
+  { name: 'Uttar Pradesh', capital: 'Lucknow', vidhanSabhaSeats: 403, rajyaSabhaSeats: 31, lokSabhaSeats: 80, type: 'state', region: 'North' },
+  { name: 'Uttarakhand', capital: 'Dehradun', vidhanSabhaSeats: 70, rajyaSabhaSeats: 3, lokSabhaSeats: 5, type: 'state', region: 'North' },
+  { name: 'West Bengal', capital: 'Kolkata', vidhanSabhaSeats: 294, rajyaSabhaSeats: 16, lokSabhaSeats: 42, type: 'state', region: 'East' },
+];
+
+/** All 8 Union Territories with electoral data */
+const UNION_TERRITORIES = [
+  { name: 'Andaman & Nicobar Islands', capital: 'Port Blair', vidhanSabhaSeats: 'No legislature', rajyaSabhaSeats: 0, lokSabhaSeats: 1, type: 'ut', region: 'Island' },
+  { name: 'Chandigarh', capital: 'Chandigarh', vidhanSabhaSeats: 'No legislature', rajyaSabhaSeats: 0, lokSabhaSeats: 1, type: 'ut', region: 'North' },
+  { name: 'Dadra & Nagar Haveli and Daman & Diu', capital: 'Daman', vidhanSabhaSeats: 'No legislature', rajyaSabhaSeats: 0, lokSabhaSeats: 2, type: 'ut', region: 'West' },
+  { name: 'Delhi (NCT)', capital: 'New Delhi', vidhanSabhaSeats: 70, rajyaSabhaSeats: 3, lokSabhaSeats: 7, type: 'ut', region: 'North' },
+  { name: 'Jammu & Kashmir', capital: 'Srinagar/Jammu', vidhanSabhaSeats: 90, rajyaSabhaSeats: 4, lokSabhaSeats: 6, type: 'ut', region: 'North' },
+  { name: 'Ladakh', capital: 'Leh', vidhanSabhaSeats: 'No legislature', rajyaSabhaSeats: 0, lokSabhaSeats: 1, type: 'ut', region: 'North' },
+  { name: 'Lakshadweep', capital: 'Kavaratti', vidhanSabhaSeats: 'No legislature', rajyaSabhaSeats: 0, lokSabhaSeats: 1, type: 'ut', region: 'Island' },
+  { name: 'Puducherry', capital: 'Puducherry', vidhanSabhaSeats: 30, rajyaSabhaSeats: 1, lokSabhaSeats: 1, type: 'ut', region: 'South' },
+];
+
+/** Detailed Lok Sabha information */
+const LOK_SABHA = {
+  name: 'Lok Sabha',
+  fullName: 'House of the People (Lower House of Parliament)',
+  totalSeats: 543,
+  term: '5 years',
+  currentTerm: '18th Lok Sabha (2024–2029)',
+  electedBy: 'Direct election by eligible voters (First-Past-The-Post system)',
+  eligibility: 'Indian citizen, 25+ years of age',
+  speaker: 'Om Birla (as of 2024)',
+  specialSeats: '131 seats reserved (84 SC + 47 ST)',
+  quorum: '10% of total membership (55 members)',
+  keyFunctions: [
+    'Passes Union Budget and Money Bills',
+    'Votes of No Confidence against the government',
+    'Amends the Constitution (with special majority)',
+    'Declares war and ratifies treaties',
+    'Elects the President jointly with Rajya Sabha and state legislatures',
+  ],
+  regions: [
+    { region: 'North India', seats: 225 },
+    { region: 'South India', seats: 130 },
+    { region: 'West India', seats: 84 },
+    { region: 'East India', seats: 72 },
+    { region: 'North East India', seats: 25 },
+    { region: 'UTs', seats: 7 },
+  ],
+};
+
+/** Detailed Rajya Sabha information */
+const RAJYA_SABHA = {
+  name: 'Rajya Sabha',
+  fullName: 'Council of States (Upper House of Parliament)',
+  totalSeats: 245,
+  electedSeats: 233,
+  nominatedSeats: 12,
+  term: '6 years (one-third retire every 2 years)',
+  currentStrength: 245,
+  electedBy: 'Indirect election by elected members of State Legislative Assemblies and UTs',
+  eligibility: 'Indian citizen, 30+ years of age',
+  chairman: 'Vice President of India (ex officio)',
+  deputyChairman: 'Elected by Rajya Sabha members',
+  isPermanent: true,
+  keyFunctions: [
+    'Represents the interests of states and UTs at the national level',
+    'Reviews and can amend Bills passed by Lok Sabha',
+    'Cannot be dissolved — a permanent house',
+    'Nominates 12 members with expertise in art, literature, science, social service',
+    'Special powers over State List subjects (Article 249)',
+  ],
+  stateSeats: [
+    { state: 'Uttar Pradesh', seats: 31 },
+    { state: 'Maharashtra', seats: 19 },
+    { state: 'Tamil Nadu', seats: 18 },
+    { state: 'Bihar', seats: 16 },
+    { state: 'West Bengal', seats: 16 },
+    { state: 'Karnataka', seats: 12 },
+    { state: 'Andhra Pradesh', seats: 11 },
+    { state: 'Gujarat', seats: 11 },
+    { state: 'Madhya Pradesh', seats: 11 },
+    { state: 'Others', seats: 83 },
+  ],
+};
+
+/** Presidential election process */
+const PRESIDENT = {
+  title: 'President of India',
+  currentPresident: 'Droupadi Murmu (15th President, since July 2022)',
+  term: '5 years',
+  eligibility: [
+    'Indian citizen',
+    '35+ years of age',
+    'Qualified to be elected as a member of the Lok Sabha',
+    'Must not hold any office of profit under the Government',
+  ],
+  electedBy: 'Electoral College comprising elected members of both Houses of Parliament AND elected members of all State Legislative Assemblies and Delhi & Puducherry legislatures',
+  votingSystem: 'Single Transferable Vote with proportional representation',
+  totalVoteValue: 'Each MP vote = sum of all MLA votes / total MPs (ensures balance between Parliament and states)',
+  process: [
+    { step: 1, title: 'Nomination', desc: 'Candidate needs 50 proposers and 50 seconders from the Electoral College. Security deposit of ₹15,000.' },
+    { step: 2, title: 'Election Commission', desc: 'ECI conducts the election. Voting is by secret ballot using a special pen.' },
+    { step: 3, title: 'Preferential Voting', desc: 'Voters mark preferences (1, 2, 3…) against candidates rather than just one choice.' },
+    { step: 4, title: 'Vote Counting', desc: 'Counting uses Single Transferable Vote — if no candidate gets majority, lowest candidate eliminated and votes redistributed.' },
+    { step: 5, title: 'Oath & Assumption', desc: 'Elected President takes oath before the Chief Justice of India in the Central Hall of Parliament.' },
+  ],
+  powers: [
+    'Head of State and Supreme Commander of Armed Forces',
+    'Appoints Prime Minister, Governors, Chief Justice, and other judges',
+    'Summons, prorogues, and dissolves Parliament',
+    'Gives assent to Bills (can return non-Money Bills once)',
+    'Declares National Emergency, President\'s Rule, and Financial Emergency',
+  ],
+  vicePresident: {
+    title: 'Vice President of India',
+    current: 'Jagdeep Dhankhar (14th Vice President, since August 2022)',
+    role: 'Ex-officio Chairman of Rajya Sabha; acts as President when office is vacant',
+    electedBy: 'Electoral College of both Houses of Parliament (not state legislatures)',
+    term: '5 years',
+  },
+};
+
 // ── Helper Functions ──────────────────────────────────────────────────────────
 
 /**
@@ -397,6 +555,25 @@ KEY TERMS:
 - BLO: Booth Level Officer (local election official)
 - ERO: Electoral Registration Officer
 
+PARLIAMENT:
+- Lok Sabha: 543 seats, 5-year term, direct vote, 25+ age, Speaker: Om Birla
+  • 131 reserved seats (84 SC + 47 ST), current: 18th Lok Sabha (2024-2029)
+- Rajya Sabha: 245 seats (233 elected + 12 nominated), 6-year term, never dissolved
+  • Elected by state MLAs, Chairman = Vice President, 30+ age
+  • Largest delegations: UP (31), Maharashtra (19), Tamil Nadu (18)
+
+PRESIDENT & VICE PRESIDENT:
+- President: Droupadi Murmu (15th, since July 2022), 5-year term
+  • Elected by Electoral College = elected MPs + elected MLAs
+  • Uses Single Transferable Vote (preferential voting)
+  • Eligibility: Indian citizen, 35+, no office of profit
+- Vice President: Jagdeep Dhankhar (14th, since Aug 2022)
+  • Ex-officio Chairman of Rajya Sabha
+
+TOP STATES BY LOK SABHA SEATS:
+- UP: 80 | Maharashtra: 48 | West Bengal: 42 | Bihar: 40
+- Tamil Nadu: 39 | Karnataka: 28 | Gujarat: 26
+
 IMPORTANT RESOURCES:
 - Voter registration: voters.eci.gov.in
 - Booth search: electoralsearch.eci.gov.in
@@ -431,10 +608,10 @@ async function translateWithGemini(text, language, apiKey) {
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKey}`,
     {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        contents:         [{ role: 'user', parts: [{ text: prompt }] }],
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: { maxOutputTokens: 256, temperature: 0.2 },
       }),
     }
@@ -507,16 +684,16 @@ app.get('/api/config', apiLimiter, (_req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
   res.json({
     firebase: {
-      apiKey:            process.env.FIREBASE_API_KEY            || '',
-      authDomain:        process.env.FIREBASE_AUTH_DOMAIN        || '',
-      projectId:         process.env.FIREBASE_PROJECT_ID         || '',
-      storageBucket:     process.env.FIREBASE_STORAGE_BUCKET     || '',
+      apiKey: process.env.FIREBASE_API_KEY || '',
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN || '',
+      projectId: process.env.FIREBASE_PROJECT_ID || '',
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET || '',
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '',
-      appId:             process.env.FIREBASE_APP_ID             || '',
-      measurementId:     process.env.FIREBASE_MEASUREMENT_ID     || '',
+      appId: process.env.FIREBASE_APP_ID || '',
+      measurementId: process.env.FIREBASE_MEASUREMENT_ID || '',
     },
     features: {
-      auth:      !!process.env.FIREBASE_API_KEY,
+      auth: !!process.env.FIREBASE_API_KEY,
       analytics: !!process.env.FIREBASE_MEASUREMENT_ID,
       translate: !!process.env.GEMINI_API_KEY,
     },
@@ -576,17 +753,17 @@ app.post('/api/quiz/submit', apiLimiter, async (req, res) => {
   }
 
   const results = ELECTION_DATA.quizQuestions.map((q, i) => ({
-    id:        q.id,
-    question:  q.q,
+    id: q.id,
+    question: q.q,
     yourAnswer: answers[i],
-    correct:   q.answer,
+    correct: q.answer,
     isCorrect: answers[i] === q.answer,
-    explain:   q.explain,
+    explain: q.explain,
   }));
 
   const score = results.filter(r => r.isCorrect).length;
   const total = results.length;
-  const sid   = typeof sessionId === 'string' ? sessionId.slice(0, 64) : 'anonymous';
+  const sid = typeof sessionId === 'string' ? sessionId.slice(0, 64) : 'anonymous';
 
   await saveQuizScore(sid, score, total);
 
@@ -613,10 +790,10 @@ app.get('/api/dates', apiLimiter, (_req, res) => {
   const dates = ELECTION_DATA.importantDates.map(d => ({
     ...d,
     calUrl: `https://calendar.google.com/calendar/render?action=TEMPLATE` +
-            `&text=${encodeURIComponent(d.event)}` +
-            `&dates=${d.calStart}/${d.calEnd}` +
-            `&details=${encodeURIComponent('Indian Election Event — VoteWise India')}` +
-            `&location=${encodeURIComponent('India')}`,
+      `&text=${encodeURIComponent(d.event)}` +
+      `&dates=${d.calStart}/${d.calEnd}` +
+      `&details=${encodeURIComponent('Indian Election Event — VoteWise India')}` +
+      `&location=${encodeURIComponent('India')}`,
   }));
 
   setCache('dates', { dates });
@@ -629,6 +806,44 @@ app.get('/api/dates', apiLimiter, (_req, res) => {
  */
 app.get('/api/announcements', apiLimiter, (_req, res) => {
   res.json({ announcements: ELECTION_DATA.announcements });
+});
+/**
+ * @route  GET /api/states
+ * @desc   Returns all 28 states and 8 UTs with electoral seat data.
+ *         Supports optional ?region= and ?type=state|ut filters.
+ */
+app.get('/api/states', apiLimiter, (req, res) => {
+  const { region, type } = req.query;
+  let states = [...STATES, ...UNION_TERRITORIES];
+  if (type && (type === 'state' || type === 'ut')) states = states.filter(s => s.type === type);
+  if (region) states = states.filter(s => s.region.toLowerCase() === decodeURIComponent(region).toLowerCase());
+  res.set('Cache-Control', 'public, max-age=3600').json({
+    states, total: states.length,
+    totalStates: STATES.length, totalUTs: UNION_TERRITORIES.length,
+  });
+});
+
+/**
+ * @route  GET /api/parliament
+ * @desc   Returns detailed Lok Sabha and Rajya Sabha information
+ */
+app.get('/api/parliament', apiLimiter, (_req, res) => {
+  const cached = getCached('parliament');
+  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached);
+  const data = { lokSabha: LOK_SABHA, rajyaSabha: RAJYA_SABHA };
+  setCache('parliament', data);
+  res.set('X-Cache', 'MISS').set('Cache-Control', 'public, max-age=3600').json(data);
+});
+
+/**
+ * @route  GET /api/president
+ * @desc   Returns Presidential and Vice Presidential election information
+ */
+app.get('/api/president', apiLimiter, (_req, res) => {
+  const cached = getCached('president');
+  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached);
+  setCache('president', PRESIDENT);
+  res.set('X-Cache', 'MISS').set('Cache-Control', 'public, max-age=3600').json(PRESIDENT);
 });
 
 /**
@@ -709,15 +924,15 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
+        body: JSON.stringify({
           system_instruction: { parts: [{ text: buildSystemPrompt() }] },
           contents,
           generationConfig: { maxOutputTokens: 512, temperature: 0.4, topP: 0.9 },
           safetySettings: [
-            { category: 'HARM_CATEGORY_HARASSMENT',   threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_HATE_SPEECH',   threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
             { category: 'HARM_CATEGORY_CIVIC_INTEGRITY', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
           ],
         }),
@@ -730,7 +945,7 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
       return res.status(502).json({ error: 'AI service temporarily unavailable. Please try again.' });
     }
 
-    const data  = await geminiRes.json();
+    const data = await geminiRes.json();
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!reply) return res.status(502).json({ error: 'Empty response from AI. Please try again.' });
@@ -756,11 +971,13 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Something went wrong.' });
 });
 
-// ── Start Server ──────────────────────────────────────────────────────────────
-const server = app.listen(PORT, () => {
-  console.log(`VoteWise India on http://localhost:${PORT}`);
-  console.log(`Gemini: ${process.env.GEMINI_API_KEY ? 'configured ✓' : 'demo mode'}`);
-  console.log(`Firestore: ${db ? 'connected ✓' : 'not configured'}`);
-});
+let server;
+if (require.main === module) {
+  server = app.listen(PORT, () => {
+    console.log(`VoteWise India on http://localhost:${PORT}`);
+    console.log(`Gemini: ${process.env.GEMINI_API_KEY ? 'configured ✓' : 'demo mode'}`);
+    console.log(`Firestore: ${db ? 'connected ✓' : 'not configured'}`);
+  });
+}
 
 module.exports = { app, server, ELECTION_DATA };

@@ -81,10 +81,9 @@ VoteWise India is a bilingual (English + Hindi) election education app for India
 ```
 VoteWiseIndia/
 ├── server.js           # Express backend — full JSDoc, modular helpers
+├── server.test.js      # Jest + Supertest — 66 tests
 ├── public/
 │   └── index.html      # SPA frontend — bilingual, accessible, saffron theme
-├── tests/
-│   └── server.test.js  # Jest + Supertest — 52 tests
 ├── Dockerfile          # Cloud Run deployment
 ├── package.json
 ├── .env.example

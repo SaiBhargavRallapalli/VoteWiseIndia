@@ -1,43 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="VoteWise India — Your AI-powered guide to Indian elections. Learn how to vote, register, and understand the democratic process." />
+  <meta name="description"
+    content="VoteWise India — Your AI-powered guide to Indian elections. Learn how to vote, register, and understand the democratic process." />
   <meta name="theme-color" content="#FF6B00" />
   <title>VoteWise India | Your Election Guide</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
   <style>
     :root {
-      --saffron:    #FF6B00;
-      --saffron-lt: rgba(255,107,0,0.12);
-      --saffron-glow: 0 0 32px rgba(255,107,0,0.2);
-      --white:      #FDFAF6;
-      --green:      #138808;
-      --green-lt:   rgba(19,136,8,0.12);
-      --navy:       #000080;
-      --bg:         #0D0F14;
-      --bg-1:       #12151C;
-      --bg-2:       #171B24;
-      --bg-3:       #1C2130;
-      --bg-4:       #212740;
-      --border:     #252B3B;
-      --border-hi:  #3A4460;
-      --text:       #EEE8DF;
-      --text-2:     #9A8E80;
-      --text-3:     #5A5248;
-      --gold:       #F0A500;
-      --gold-lt:    rgba(240,165,0,0.12);
-      --r:          10px;
-      --r-sm:       6px;
-      --font-h:     'Playfair Display', serif;
-      --font-b:     'DM Sans', sans-serif;
-      --font-m:     'DM Mono', monospace;
+      --saffron: #FF6B00;
+      --saffron-lt: rgba(255, 107, 0, 0.12);
+      --saffron-glow: 0 0 32px rgba(255, 107, 0, 0.2);
+      --white: #FDFAF6;
+      --green: #138808;
+      --green-lt: rgba(19, 136, 8, 0.12);
+      --navy: #000080;
+      --bg: #0D0F14;
+      --bg-1: #12151C;
+      --bg-2: #171B24;
+      --bg-3: #1C2130;
+      --bg-4: #212740;
+      --border: #252B3B;
+      --border-hi: #3A4460;
+      --text: #EEE8DF;
+      --text-2: #9A8E80;
+      --text-3: #5A5248;
+      --gold: #F0A500;
+      --gold-lt: rgba(240, 165, 0, 0.12);
+      --r: 10px;
+      --r-sm: 6px;
+      --font-h: 'Playfair Display', serif;
+      --font-b: 'DM Sans', sans-serif;
+      --font-m: 'DM Mono', monospace;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: var(--font-b);
@@ -49,71 +59,122 @@
 
     /* Skip to content for accessibility */
     .skip-link {
-      position: absolute; top: -40px; left: 1rem;
-      background: var(--saffron); color: #fff;
-      padding: 0.5rem 1rem; border-radius: var(--r-sm);
-      font-size: 0.85rem; font-weight: 600;
-      transition: top 0.2s; z-index: 999;
+      position: absolute;
+      top: -40px;
+      left: 1rem;
+      background: var(--saffron);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: var(--r-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: top 0.2s;
+      z-index: 999;
       text-decoration: none;
     }
-    .skip-link:focus { top: 0.5rem; }
+
+    .skip-link:focus {
+      top: 0.5rem;
+    }
 
     /* Ashoka Chakra inspired bg pattern */
     body::before {
       content: '';
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background-image:
-        radial-gradient(circle at 20% 50%, rgba(255,107,0,0.04) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(19,136,8,0.04) 0%, transparent 50%),
-        radial-gradient(circle at 50% 80%, rgba(0,0,128,0.03) 0%, transparent 50%);
-      pointer-events: none; z-index: 0;
+        radial-gradient(circle at 20% 50%, rgba(255, 107, 0, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(19, 136, 8, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(0, 0, 128, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* ── Header ─────────────────────────────────────────────── */
     header {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(13,15,20,0.94);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 15, 20, 0.94);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
 
     .header-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: center; gap: 1rem;
-      padding: 0 1.5rem; height: 64px;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0 1.5rem;
+      height: 64px;
     }
 
-    .logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
 
     .logo-icon {
-      width: 36px; height: 36px; border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       background: linear-gradient(135deg, var(--saffron), var(--gold));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; box-shadow: var(--saffron-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: var(--saffron-glow);
     }
 
     .logo-text {
       font-family: var(--font-h);
-      font-size: 1.15rem; font-weight: 700;
-      color: var(--text); letter-spacing: -0.01em;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
     }
-    .logo-text span { color: var(--saffron); }
 
-    .header-right { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; }
+    .logo-text span {
+      color: var(--saffron);
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
 
     #auth-btn {
-      padding: 0.4rem 1rem; border-radius: 999px;
-      background: var(--saffron-lt); border: 1px solid var(--saffron);
-      color: var(--saffron); font-size: 0.8rem; cursor: pointer;
-      font-family: var(--font-b); transition: all 0.15s; white-space: nowrap;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      background: var(--saffron-lt);
+      border: 1px solid var(--saffron);
+      color: var(--saffron);
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: var(--font-b);
+      transition: all 0.15s;
+      white-space: nowrap;
     }
-    #auth-btn:hover { background: var(--saffron); color: #fff; }
+
+    #auth-btn:hover {
+      background: var(--saffron);
+      color: #fff;
+    }
 
     .lang-select {
-      background: var(--bg-2); border: 1px solid var(--border);
-      color: var(--text-2); border-radius: var(--r-sm);
-      padding: 0.35rem 0.6rem; font-size: 0.78rem;
-      font-family: var(--font-b); cursor: pointer;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      border-radius: var(--r-sm);
+      padding: 0.35rem 0.6rem;
+      font-size: 0.78rem;
+      font-family: var(--font-b);
+      cursor: pointer;
     }
 
     /* ── Nav ────────────────────────────────────────────────── */
@@ -121,47 +182,97 @@
       background: var(--bg-1);
       border-bottom: 3px solid transparent;
       border-image: linear-gradient(90deg, var(--saffron), var(--white) 50%, var(--green)) 1;
-      position: sticky; top: 64px; z-index: 99;
+      position: sticky;
+      top: 64px;
+      z-index: 99;
     }
 
     .nav-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; overflow-x: auto; scrollbar-width: none;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
       padding: 0 1.5rem;
     }
-    .nav-inner::-webkit-scrollbar { display: none; }
+
+    .nav-inner::-webkit-scrollbar {
+      display: none;
+    }
 
     .nav-btn {
-      display: flex; align-items: center; gap: 0.45rem;
-      padding: 0 1.1rem; height: 48px;
-      font-family: var(--font-b); font-size: 0.875rem; font-weight: 500;
-      color: var(--text-2); background: none; border: none;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0 1.1rem;
+      height: 48px;
+      font-family: var(--font-b);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-2);
+      background: none;
+      border: none;
       border-bottom: 2px solid transparent;
-      cursor: pointer; white-space: nowrap;
+      cursor: pointer;
+      white-space: nowrap;
       transition: color 0.2s, border-color 0.2s;
     }
-    .nav-btn:hover { color: var(--text); }
-    .nav-btn.active { color: var(--saffron); border-bottom-color: var(--saffron); }
+
+    .nav-btn:hover {
+      color: var(--text);
+    }
+
+    .nav-btn.active {
+      color: var(--saffron);
+      border-bottom-color: var(--saffron);
+    }
 
     /* ── Main ───────────────────────────────────────────────── */
     main {
-      max-width: 1100px; margin: 0 auto;
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 2rem 1.5rem 4rem;
-      position: relative; z-index: 1;
+      position: relative;
+      z-index: 1;
     }
 
-    .panel { display: none; animation: fadeIn 0.25s ease; }
-    .panel.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .panel {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     /* ── Section Title ──────────────────────────────────────── */
     .section-title {
-      font-family: var(--font-h); font-size: 1.2rem; font-weight: 700;
-      color: var(--text); margin-bottom: 1.25rem;
-      display: flex; align-items: center; gap: 0.6rem;
+      font-family: var(--font-h);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
     }
+
     .section-title::after {
-      content: ''; flex: 1; height: 1px;
+      content: '';
+      flex: 1;
+      height: 1px;
       background: linear-gradient(90deg, var(--border), transparent);
     }
 
@@ -169,368 +280,964 @@
     .hero {
       background: linear-gradient(135deg, var(--bg-2), var(--bg-3));
       border: 1px solid var(--border);
-      border-radius: 16px; padding: 2.5rem;
-      margin-bottom: 1.5rem; position: relative; overflow: hidden;
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
     }
+
     .hero::before {
-      content: ''; position: absolute; top: -60px; right: -60px;
-      width: 280px; height: 280px;
-      background: radial-gradient(circle, rgba(255,107,0,0.08), transparent 70%);
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(255, 107, 0, 0.08), transparent 70%);
       pointer-events: none;
     }
+
     .hero::after {
-      content: '🇮🇳'; position: absolute;
-      bottom: 1.5rem; right: 2rem;
-      font-size: 4rem; opacity: 0.12;
+      content: '🇮🇳';
+      position: absolute;
+      bottom: 1.5rem;
+      right: 2rem;
+      font-size: 4rem;
+      opacity: 0.12;
       pointer-events: none;
     }
 
     .hero-tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--saffron-lt); border: 1px solid rgba(255,107,0,0.3);
-      border-radius: 999px; padding: 4px 12px;
-      font-family: var(--font-m); font-size: 0.7rem; color: var(--saffron);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--saffron-lt);
+      border: 1px solid rgba(255, 107, 0, 0.3);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+      color: var(--saffron);
       margin-bottom: 1rem;
     }
-    .hero-tag::before { content: '●'; font-size: 0.5rem; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+    .hero-tag::before {
+      content: '●';
+      font-size: 0.5rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.3
+      }
+    }
 
     .hero h1 {
       font-family: var(--font-h);
       font-size: clamp(1.8rem, 4vw, 3rem);
-      font-weight: 800; line-height: 1.1;
-      letter-spacing: -0.02em; margin-bottom: 0.75rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
     }
-    .hero h1 span { color: var(--saffron); }
-    .hero-sub { font-size: 1rem; color: var(--text-2); max-width: 560px; line-height: 1.6; }
 
-    .facts-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
-      gap: 1rem; margin: 1.5rem 0;
-    }
-    .fact-card {
-      background: var(--bg-3); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 1.25rem; text-align: center;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-    .fact-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
-    .fact-val { font-family: var(--font-h); font-size: 1.6rem; font-weight: 800; color: var(--saffron); }
-    .fact-lbl { font-size: 0.78rem; color: var(--text-2); margin-top: 4px; }
-
-    .election-types {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
-      gap: 1rem;
-    }
-    .type-card {
-      background: var(--bg-2); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 1.25rem;
-      transition: border-color 0.2s;
-    }
-    .type-card:hover { border-color: var(--border-hi); }
-    .type-name { font-family: var(--font-h); font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--saffron); }
-    .type-desc { font-size: 0.8rem; color: var(--text-2); line-height: 1.5; }
-    .type-meta { font-family: var(--font-m); font-size: 0.7rem; color: var(--text-3); margin-top: 0.6rem; }
-
-    /* ── HOW TO VOTE ────────────────────────────────────────── */
-    .steps-list { display: flex; flex-direction: column; gap: 1rem; }
-
-    .step-card {
-      background: var(--bg-2); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 1.25rem 1.5rem;
-      display: grid; grid-template-columns: 64px 1fr;
-      gap: 1rem; align-items: start;
-      transition: border-color 0.2s, transform 0.15s;
-    }
-    .step-card:hover { border-color: var(--saffron); transform: translateX(4px); }
-
-    .step-num {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: var(--saffron-lt); border: 2px solid rgba(255,107,0,0.4);
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-h); font-size: 1.1rem; font-weight: 800;
+    .hero h1 span {
       color: var(--saffron);
     }
-    .step-icon { font-size: 1.4rem; text-align: center; }
-    .step-title { font-family: var(--font-h); font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
-    .step-desc { font-size: 0.82rem; color: var(--text-2); line-height: 1.6; }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--text-2);
+      max-width: 560px;
+      line-height: 1.6;
+    }
+
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .fact-card {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .fact-card:hover {
+      border-color: var(--border-hi);
+      transform: translateY(-2px);
+    }
+
+    .fact-val {
+      font-family: var(--font-h);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--saffron);
+    }
+
+    .fact-lbl {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      margin-top: 4px;
+    }
+
+    .election-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .type-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+
+    .type-card:hover {
+      border-color: var(--border-hi);
+    }
+
+    .type-name {
+      font-family: var(--font-h);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--saffron);
+    }
+
+    .type-desc {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    .type-meta {
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+      color: var(--text-3);
+      margin-top: 0.6rem;
+    }
+
+    /* ── HOW TO VOTE ────────────────────────────────────────── */
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .step-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 1rem;
+      align-items: start;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .step-card:hover {
+      border-color: var(--saffron);
+      transform: translateX(4px);
+    }
+
+    .step-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--saffron-lt);
+      border: 2px solid rgba(255, 107, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-h);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--saffron);
+    }
+
+    .step-icon {
+      font-size: 1.4rem;
+      text-align: center;
+    }
+
+    .step-title {
+      font-family: var(--font-h);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .step-desc {
+      font-size: 0.82rem;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
 
     /* ── QUIZ ───────────────────────────────────────────────── */
     .quiz-container {
-      background: var(--bg-2); border: 1px solid var(--border);
-      border-radius: 16px; padding: 2rem; max-width: 700px; margin: 0 auto;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 700px;
+      margin: 0 auto;
     }
 
     .quiz-progress {
-      display: flex; align-items: center; gap: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       margin-bottom: 1.5rem;
     }
+
     .progress-bar {
-      flex: 1; height: 6px; background: var(--bg-3);
-      border-radius: 999px; overflow: hidden;
+      flex: 1;
+      height: 6px;
+      background: var(--bg-3);
+      border-radius: 999px;
+      overflow: hidden;
     }
+
     .progress-fill {
-      height: 100%; background: linear-gradient(90deg, var(--saffron), var(--gold));
-      border-radius: 999px; transition: width 0.3s ease;
+      height: 100%;
+      background: linear-gradient(90deg, var(--saffron), var(--gold));
+      border-radius: 999px;
+      transition: width 0.3s ease;
     }
-    .progress-text { font-family: var(--font-m); font-size: 0.75rem; color: var(--text-2); white-space: nowrap; }
+
+    .progress-text {
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      color: var(--text-2);
+      white-space: nowrap;
+    }
 
     .quiz-question {
-      font-family: var(--font-h); font-size: 1.15rem; font-weight: 700;
-      margin-bottom: 1.25rem; line-height: 1.4;
+      font-family: var(--font-h);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
     }
 
-    .quiz-options { display: flex; flex-direction: column; gap: 0.6rem; }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
 
     .quiz-option {
-      background: var(--bg-3); border: 2px solid var(--border);
-      border-radius: var(--r); padding: 0.9rem 1.1rem;
-      font-size: 0.875rem; cursor: pointer; text-align: left;
-      font-family: var(--font-b); color: var(--text);
+      background: var(--bg-3);
+      border: 2px solid var(--border);
+      border-radius: var(--r);
+      padding: 0.9rem 1.1rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font-b);
+      color: var(--text);
       transition: all 0.15s;
     }
-    .quiz-option:hover:not(:disabled) { border-color: var(--saffron); background: var(--saffron-lt); }
-    .quiz-option.correct { border-color: var(--green); background: var(--green-lt); color: #4CAF50; }
-    .quiz-option.wrong { border-color: #ef5350; background: rgba(239,83,80,0.1); color: #ef5350; }
-    .quiz-option:disabled { cursor: not-allowed; }
+
+    .quiz-option:hover:not(:disabled) {
+      border-color: var(--saffron);
+      background: var(--saffron-lt);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--green);
+      background: var(--green-lt);
+      color: #4CAF50;
+    }
+
+    .quiz-option.wrong {
+      border-color: #ef5350;
+      background: rgba(239, 83, 80, 0.1);
+      color: #ef5350;
+    }
+
+    .quiz-option:disabled {
+      cursor: not-allowed;
+    }
 
     .quiz-explain {
-      background: var(--bg-3); border-left: 3px solid var(--gold);
+      background: var(--bg-3);
+      border-left: 3px solid var(--gold);
       border-radius: 0 var(--r-sm) var(--r-sm) 0;
-      padding: 0.8rem 1rem; font-size: 0.82rem;
-      color: var(--text-2); margin-top: 0.75rem; line-height: 1.6;
+      padding: 0.8rem 1rem;
+      font-size: 0.82rem;
+      color: var(--text-2);
+      margin-top: 0.75rem;
+      line-height: 1.6;
       display: none;
     }
-    .quiz-explain.visible { display: block; animation: fadeIn 0.2s ease; }
+
+    .quiz-explain.visible {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
 
     .quiz-nav {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-top: 1.5rem;
     }
 
     .btn {
-      padding: 0.65rem 1.5rem; border-radius: var(--r-sm);
-      font-family: var(--font-b); font-size: 0.875rem; font-weight: 600;
-      cursor: pointer; transition: all 0.15s; border: none;
+      padding: 0.65rem 1.5rem;
+      border-radius: var(--r-sm);
+      font-family: var(--font-b);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
     }
-    .btn-primary { background: var(--saffron); color: #fff; }
-    .btn-primary:hover { background: #e55e00; }
-    .btn-secondary { background: var(--bg-3); border: 1px solid var(--border); color: var(--text-2); }
-    .btn-secondary:hover { border-color: var(--border-hi); color: var(--text); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--saffron);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #e55e00;
+    }
+
+    .btn-secondary {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-hi);
+      color: var(--text);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     /* Quiz result */
     .quiz-result {
-      text-align: center; padding: 1rem;
+      text-align: center;
+      padding: 1rem;
     }
+
     .result-score {
-      font-family: var(--font-h); font-size: 4rem; font-weight: 800;
-      color: var(--saffron); line-height: 1;
+      font-family: var(--font-h);
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--saffron);
+      line-height: 1;
     }
-    .result-label { font-size: 1rem; color: var(--text-2); margin-bottom: 1.5rem; }
+
+    .result-label {
+      font-size: 1rem;
+      color: var(--text-2);
+      margin-bottom: 1.5rem;
+    }
+
     .result-badge {
-      display: inline-block; padding: 0.5rem 1.5rem;
-      border-radius: 999px; font-weight: 600; font-size: 0.9rem;
+      display: inline-block;
+      padding: 0.5rem 1.5rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
       margin-bottom: 1.5rem;
     }
 
     /* ── VENUE MAP ──────────────────────────────────────────── */
     .map-section {
-      display: grid; grid-template-columns: 1fr 320px;
-      gap: 1.5rem; align-items: start;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+      align-items: start;
     }
-    @media(max-width:768px) { .map-section { grid-template-columns: 1fr; } }
+
+    @media(max-width:768px) {
+      .map-section {
+        grid-template-columns: 1fr;
+      }
+    }
 
     .map-frame {
-      border-radius: var(--r); overflow: hidden;
+      border-radius: var(--r);
+      overflow: hidden;
       border: 1px solid var(--border);
     }
-    .map-frame iframe { display: block; width: 100%; height: 400px; border: 0; }
+
+    .map-frame iframe {
+      display: block;
+      width: 100%;
+      height: 400px;
+      border: 0;
+    }
 
     .eci-info {
-      background: var(--bg-2); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 1.25rem;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem;
     }
-    .eci-info h3 { font-family: var(--font-h); font-size: 0.95rem; font-weight: 700; color: var(--saffron); margin-bottom: 0.75rem; }
+
+    .eci-info h3 {
+      font-family: var(--font-h);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--saffron);
+      margin-bottom: 0.75rem;
+    }
+
     .eci-link {
-      display: flex; align-items: center; gap: 0.5rem;
-      padding: 0.6rem 0.8rem; border-radius: var(--r-sm);
-      background: var(--bg-3); border: 1px solid var(--border);
-      color: var(--text-2); text-decoration: none; font-size: 0.8rem;
-      margin-bottom: 0.5rem; transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: var(--r-sm);
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      text-decoration: none;
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+      transition: all 0.15s;
     }
-    .eci-link:hover { border-color: var(--saffron); color: var(--saffron); }
+
+    .eci-link:hover {
+      border-color: var(--saffron);
+      color: var(--saffron);
+    }
 
     /* ── AI CHAT ────────────────────────────────────────────── */
-    .chat-layout { display: grid; grid-template-columns: 1fr 270px; gap: 1.5rem; }
-    @media(max-width:768px) { .chat-layout { grid-template-columns: 1fr; } }
+    .chat-layout {
+      display: grid;
+      grid-template-columns: 1fr 270px;
+      gap: 1.5rem;
+    }
+
+    @media(max-width:768px) {
+      .chat-layout {
+        grid-template-columns: 1fr;
+      }
+    }
 
     .chat-container {
-      background: var(--bg-2); border: 1px solid var(--border);
-      border-radius: var(--r); display: flex; flex-direction: column;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      display: flex;
+      flex-direction: column;
       height: 560px;
     }
 
     .chat-header {
-      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
+
     .ai-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
       background: linear-gradient(135deg, var(--saffron), var(--gold));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; box-shadow: var(--saffron-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: var(--saffron-glow);
     }
-    .chat-title { font-family: var(--font-h); font-size: 0.95rem; font-weight: 700; }
-    .chat-sub { font-size: 0.72rem; color: var(--text-2); }
+
+    .chat-title {
+      font-family: var(--font-h);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .chat-sub {
+      font-size: 0.72rem;
+      color: var(--text-2);
+    }
+
     .online-dot {
-      margin-left: auto; display: flex; align-items: center; gap: 0.4rem;
-      font-family: var(--font-m); font-size: 0.68rem; color: var(--green);
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      color: var(--green);
     }
-    .online-dot::before { content: '●'; font-size: 0.5rem; animation: pulse 2s infinite; }
+
+    .online-dot::before {
+      content: '●';
+      font-size: 0.5rem;
+      animation: pulse 2s infinite;
+    }
 
     .chat-messages {
-      flex: 1; overflow-y: auto; padding: 1.25rem;
-      display: flex; flex-direction: column; gap: 1rem;
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
       scroll-behavior: smooth;
     }
-    .chat-messages::-webkit-scrollbar { width: 4px; }
-    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    .msg { display: flex; gap: 0.6rem; align-items: flex-start; animation: fadeIn 0.2s ease; }
-    .msg.user { flex-direction: row-reverse; }
+    .chat-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .msg {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .msg.user {
+      flex-direction: row-reverse;
+    }
 
     .msg-av {
-      width: 28px; height: 28px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem; flex-shrink: 0; font-family: var(--font-m);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      flex-shrink: 0;
+      font-family: var(--font-m);
     }
-    .msg.bot .msg-av { background: linear-gradient(135deg, var(--saffron), var(--gold)); color: #fff; }
-    .msg.user .msg-av { background: var(--bg-3); border: 1px solid var(--border); color: var(--text-2); }
+
+    .msg.bot .msg-av {
+      background: linear-gradient(135deg, var(--saffron), var(--gold));
+      color: #fff;
+    }
+
+    .msg.user .msg-av {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
 
     .msg-bubble {
-      max-width: 78%; padding: 0.7rem 1rem;
-      border-radius: 12px; font-size: 0.845rem; line-height: 1.65;
+      max-width: 78%;
+      padding: 0.7rem 1rem;
+      border-radius: 12px;
+      font-size: 0.845rem;
+      line-height: 1.65;
     }
-    .msg.bot  .msg-bubble { background: var(--bg-3); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-    .msg.user .msg-bubble { background: var(--saffron-lt); border: 1px solid rgba(255,107,0,0.3); border-bottom-right-radius: 4px; }
-    .msg-bubble strong { color: var(--saffron); }
-    .msg-bubble ul { padding-left: 1.2rem; margin-top: 0.3rem; }
-    .msg-bubble li { margin-bottom: 0.2rem; }
 
-    .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 0.7rem 1rem; }
-    .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-3); animation: typing 1.2s ease-in-out infinite; }
-    .typing-dot:nth-child(2){animation-delay:.2s} .typing-dot:nth-child(3){animation-delay:.4s}
-    @keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-6px);opacity:1} }
+    .msg.bot .msg-bubble {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg.user .msg-bubble {
+      background: var(--saffron-lt);
+      border: 1px solid rgba(255, 107, 0, 0.3);
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-bubble strong {
+      color: var(--saffron);
+    }
+
+    .msg-bubble ul {
+      padding-left: 1.2rem;
+      margin-top: 0.3rem;
+    }
+
+    .msg-bubble li {
+      margin-bottom: 0.2rem;
+    }
+
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 0.7rem 1rem;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-3);
+      animation: typing 1.2s ease-in-out infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: .2s
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: .4s
+    }
+
+    @keyframes typing {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+        opacity: .4
+      }
+
+      30% {
+        transform: translateY(-6px);
+        opacity: 1
+      }
+    }
 
     .chat-input-area {
-      padding: 1rem; border-top: 1px solid var(--border);
-      display: flex; gap: 0.5rem; align-items: flex-end;
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
     }
+
     #chat-input {
-      flex: 1; background: var(--bg-3); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.65rem 0.9rem;
-      font-family: var(--font-b); font-size: 0.85rem; color: var(--text);
-      resize: none; max-height: 100px; min-height: 38px;
-      outline: none; transition: border-color 0.15s;
+      flex: 1;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      font-family: var(--font-b);
+      font-size: 0.85rem;
+      color: var(--text);
+      resize: none;
+      max-height: 100px;
+      min-height: 38px;
+      outline: none;
+      transition: border-color 0.15s;
     }
-    #chat-input:focus { border-color: var(--saffron); }
-    #chat-input::placeholder { color: var(--text-3); }
+
+    #chat-input:focus {
+      border-color: var(--saffron);
+    }
+
+    #chat-input::placeholder {
+      color: var(--text-3);
+    }
+
     #send-btn {
-      width: 38px; height: 38px; border-radius: 8px;
-      background: var(--saffron); border: none;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; flex-shrink: 0; font-size: 15px;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: var(--saffron);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-size: 15px;
       transition: background 0.15s, transform 0.1s;
     }
-    #send-btn:hover { background: #e55e00; }
-    #send-btn:active { transform: scale(0.95); }
-    #send-btn:disabled { background: var(--bg-3); border: 1px solid var(--border); cursor: not-allowed; }
 
-    .sidebar-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; margin-bottom: 1rem; }
-    .sidebar-title { font-family: var(--font-h); font-size: 0.85rem; font-weight: 700; color: var(--saffron); margin-bottom: 0.75rem; }
+    #send-btn:hover {
+      background: #e55e00;
+    }
+
+    #send-btn:active {
+      transform: scale(0.95);
+    }
+
+    #send-btn:disabled {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      cursor: not-allowed;
+    }
+
+    .sidebar-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .sidebar-title {
+      font-family: var(--font-h);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--saffron);
+      margin-bottom: 0.75rem;
+    }
 
     .quick-btn {
-      display: block; width: 100%; text-align: left;
-      background: var(--bg-3); border: 1px solid var(--border);
-      border-radius: var(--r-sm); padding: 0.55rem 0.8rem;
-      font-size: 0.78rem; color: var(--text-2); cursor: pointer;
-      margin-bottom: 0.45rem; transition: all 0.15s; font-family: var(--font-b);
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 0.55rem 0.8rem;
+      font-size: 0.78rem;
+      color: var(--text-2);
+      cursor: pointer;
+      margin-bottom: 0.45rem;
+      transition: all 0.15s;
+      font-family: var(--font-b);
     }
-    .quick-btn:hover { background: var(--saffron-lt); border-color: var(--saffron); color: var(--saffron); }
-    .quick-btn:last-child { margin-bottom: 0; }
+
+    .quick-btn:hover {
+      background: var(--saffron-lt);
+      border-color: var(--saffron);
+      color: var(--saffron);
+    }
+
+    .quick-btn:last-child {
+      margin-bottom: 0;
+    }
 
     /* ── DATES ──────────────────────────────────────────────── */
-    .dates-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .dates-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
     .date-card {
-      background: var(--bg-2); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 1.1rem 1.25rem;
-      display: flex; align-items: center; gap: 1rem;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       transition: border-color 0.2s;
     }
-    .date-card:hover { border-color: var(--border-hi); }
-    .date-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .date-dot.election { background: var(--saffron); }
-    .date-dot.general  { background: var(--gold); }
-    .date-dot.local    { background: var(--green); }
-    .date-dot.admin    { background: var(--text-3); }
-    .date-info { flex: 1; }
-    .date-event { font-size: 0.9rem; font-weight: 600; }
-    .date-when  { font-family: var(--font-m); font-size: 0.72rem; color: var(--text-2); margin-top: 2px; }
+
+    .date-card:hover {
+      border-color: var(--border-hi);
+    }
+
+    .date-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .date-dot.election {
+      background: var(--saffron);
+    }
+
+    .date-dot.general {
+      background: var(--gold);
+    }
+
+    .date-dot.local {
+      background: var(--green);
+    }
+
+    .date-dot.admin {
+      background: var(--text-3);
+    }
+
+    .date-info {
+      flex: 1;
+    }
+
+    .date-event {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .date-when {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+
     .cal-btn {
-      display: flex; align-items: center; gap: 0.35rem;
-      padding: 0.4rem 0.7rem; border-radius: var(--r-sm);
-      background: var(--bg-3); border: 1px solid var(--border);
-      font-size: 0.72rem; color: var(--text-2); cursor: pointer;
-      text-decoration: none; font-family: var(--font-b); flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: var(--r-sm);
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--text-2);
+      cursor: pointer;
+      text-decoration: none;
+      font-family: var(--font-b);
+      flex-shrink: 0;
       transition: all 0.15s;
     }
-    .cal-btn:hover { background: var(--saffron-lt); border-color: var(--saffron); color: var(--saffron); }
+
+    .cal-btn:hover {
+      background: var(--saffron-lt);
+      border-color: var(--saffron);
+      color: var(--saffron);
+    }
 
     /* ── ANNOUNCEMENTS ──────────────────────────────────────── */
-    .ann-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .ann-item {
-      background: var(--bg-2); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 1rem 1.25rem;
-      display: flex; gap: 1rem; align-items: flex-start;
+    .ann-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
     }
-    .ann-item.info    { border-left: 3px solid var(--saffron); }
-    .ann-item.success { border-left: 3px solid var(--green); }
-    .ann-item.warning { border-left: 3px solid var(--gold); }
-    .ann-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
-    .ann-text { font-size: 0.875rem; line-height: 1.5; }
-    .ann-time { font-family: var(--font-m); font-size: 0.7rem; color: var(--text-3); margin-top: 4px; }
+
+    .ann-item {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1rem 1.25rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .ann-item.info {
+      border-left: 3px solid var(--saffron);
+    }
+
+    .ann-item.success {
+      border-left: 3px solid var(--green);
+    }
+
+    .ann-item.warning {
+      border-left: 3px solid var(--gold);
+    }
+
+    .ann-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .ann-text {
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .ann-time {
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
 
     /* ── Translate ──────────────────────────────────────────── */
     .translate-box {
-      background: var(--bg-2); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 1.5rem; max-width: 640px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.5rem;
+      max-width: 640px;
     }
-    .translate-box select, .translate-box textarea {
-      width: 100%; background: var(--bg-3); border: 1px solid var(--border);
-      color: var(--text); border-radius: var(--r-sm);
-      padding: 0.65rem 0.9rem; font-family: var(--font-b); font-size: 0.85rem;
-      margin-bottom: 0.75rem; outline: none; transition: border-color 0.15s;
+
+    .translate-box select,
+    .translate-box textarea {
+      width: 100%;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--r-sm);
+      padding: 0.65rem 0.9rem;
+      font-family: var(--font-b);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+      outline: none;
+      transition: border-color 0.15s;
     }
-    .translate-box select:focus, .translate-box textarea:focus { border-color: var(--saffron); }
+
+    .translate-box select:focus,
+    .translate-box textarea:focus {
+      border-color: var(--saffron);
+    }
+
     .translate-result {
-      background: var(--bg-3); border: 1px solid var(--border);
-      border-radius: var(--r-sm); padding: 1rem;
-      font-size: 0.9rem; line-height: 1.7; min-height: 60px;
-      color: var(--text); margin-top: 0.75rem;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      min-height: 60px;
+      color: var(--text);
+      margin-top: 0.75rem;
     }
 
     /* ── Utility ────────────────────────────────────────────── */
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-    .loading-state { text-align: center; padding: 3rem; color: var(--text-3); font-family: var(--font-m); font-size: 0.8rem; }
-    .error-state { background: rgba(239,83,80,0.1); border: 1px solid rgba(239,83,80,0.3); border-radius: var(--r); padding: 1rem 1.25rem; color: #ef5350; font-size: 0.85rem; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-3);
+      font-family: var(--font-m);
+      font-size: 0.8rem;
+    }
+
+    .error-state {
+      background: rgba(239, 83, 80, 0.1);
+      border: 1px solid rgba(239, 83, 80, 0.3);
+      border-radius: var(--r);
+      padding: 1rem 1.25rem;
+      color: #ef5350;
+      font-size: 0.85rem;
+    }
 
     @media(max-width:640px) {
-      main { padding: 1.25rem 1rem 3rem; }
-      .hero { padding: 1.5rem; }
-      .step-card { grid-template-columns: 48px 1fr; }
+      main {
+        padding: 1.25rem 1rem 3rem;
+      }
+
+      .hero {
+        padding: 1.5rem;
+      }
+
+      .step-card {
+        grid-template-columns: 48px 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -553,15 +1260,18 @@
 
   <nav role="navigation" aria-label="Main navigation">
     <div class="nav-inner">
-      <button class="nav-btn active" data-panel="home"         aria-selected="true"  role="tab">🏠 Home</button>
-      <button class="nav-btn"        data-panel="how-to-vote"  aria-selected="false" role="tab">🗳️ How to Vote</button>
-      <button class="nav-btn"        data-panel="register"     aria-selected="false" role="tab">📋 Registration</button>
-      <button class="nav-btn"        data-panel="quiz"         aria-selected="false" role="tab">🎯 Quiz</button>
-      <button class="nav-btn"        data-panel="map"          aria-selected="false" role="tab">📍 ECI Map</button>
-      <button class="nav-btn"        data-panel="chat"         aria-selected="false" role="tab">🤖 AI Assistant</button>
-      <button class="nav-btn"        data-panel="dates"        aria-selected="false" role="tab">📅 Dates</button>
-      <button class="nav-btn"        data-panel="translate"    aria-selected="false" role="tab">🌐 Translate</button>
-      <button class="nav-btn"        data-panel="updates"      aria-selected="false" role="tab">📢 Updates</button>
+      <button class="nav-btn active" data-panel="home" aria-selected="true" role="tab">🏠 Home</button>
+      <button class="nav-btn" data-panel="how-to-vote" aria-selected="false" role="tab">🗳️ How to Vote</button>
+      <button class="nav-btn" data-panel="register" aria-selected="false" role="tab">📋 Registration</button>
+      <button class="nav-btn" data-panel="quiz" aria-selected="false" role="tab">🎯 Quiz</button>
+      <button class="nav-btn" data-panel="map" aria-selected="false" role="tab">📍 ECI Map</button>
+      <button class="nav-btn" data-panel="chat" aria-selected="false" role="tab">🤖 AI Assistant</button>
+      <button class="nav-btn" data-panel="dates" aria-selected="false" role="tab">📅 Dates</button>
+      <button class="nav-btn" data-panel="parliament" aria-selected="false" role="tab">🏛️ Parliament</button>
+      <button class="nav-btn" data-panel="states" aria-selected="false" role="tab">🗺️ States &amp; UTs</button>
+      <button class="nav-btn" data-panel="president" aria-selected="false" role="tab">🇮🇳 President</button>
+      <button class="nav-btn" data-panel="translate" aria-selected="false" role="tab">🌐 Translate</button>
+      <button class="nav-btn" data-panel="updates" aria-selected="false" role="tab">📢 Updates</button>
     </div>
   </nav>
 
@@ -572,7 +1282,8 @@
       <div class="hero">
         <div class="hero-tag">India's Democracy Guide</div>
         <h1>Your Vote,<br><span>Your Voice</span></h1>
-        <p class="hero-sub">Understand Indian elections — from Lok Sabha to Panchayat — with AI-powered guidance. Know your rights, register to vote, and participate in democracy.</p>
+        <p class="hero-sub">Understand Indian elections — from Lok Sabha to Panchayat — with AI-powered guidance. Know
+          your rights, register to vote, and participate in democracy.</p>
       </div>
 
       <div class="facts-grid" id="facts-grid" role="list" aria-label="Election statistics"></div>
@@ -593,9 +1304,12 @@
       <div class="steps-list" id="reg-steps" role="list" aria-label="Registration steps"></div>
       <div style="margin-top:1.5rem;" class="sidebar-card">
         <div class="sidebar-title">🔗 Official Registration Links</div>
-        <a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📌 voters.eci.gov.in — Apply / Check Status</a>
-        <a href="https://electoralsearch.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">🔍 electoralsearch.eci.gov.in — Search Electoral Roll</a>
-        <a href="https://affidavit.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📄 affidavit.eci.gov.in — Candidate Affidavits</a>
+        <a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📌
+          voters.eci.gov.in — Apply / Check Status</a>
+        <a href="https://electoralsearch.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">🔍
+          electoralsearch.eci.gov.in — Search Electoral Roll</a>
+        <a href="https://affidavit.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📄
+          affidavit.eci.gov.in — Candidate Affidavits</a>
       </div>
     </section>
 
@@ -615,18 +1329,20 @@
           <div class="map-frame">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.9!2d77.2090!3d28.6304!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x52c2b7494e204dce!2sElection%20Commission%20of%20India!5e0!3m2!1sen!2sin!4v1713000000000!5m2!1sen!2sin"
-              allowfullscreen="" loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
               title="Election Commission of India, New Delhi"
               aria-label="Google Maps showing Election Commission of India location">
             </iframe>
           </div>
-          <div style="margin-top:1rem;padding:1rem;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);">
+          <div
+            style="margin-top:1rem;padding:1rem;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);">
             <p style="font-size:0.85rem;color:var(--text-2);line-height:1.7;">
               <strong style="color:var(--text)">Election Commission of India</strong><br>
               Nirvachan Sadan, Ashoka Road, New Delhi — 110001<br><br>
-              <span style="color:var(--saffron)">📞</span> Voter Helpline: <strong style="color:var(--saffron)">1950</strong><br>
-              <span style="color:var(--saffron)">🌐</span> Website: <a href="https://eci.gov.in" target="_blank" rel="noopener noreferrer" style="color:var(--saffron)">eci.gov.in</a><br>
+              <span style="color:var(--saffron)">📞</span> Voter Helpline: <strong
+                style="color:var(--saffron)">1950</strong><br>
+              <span style="color:var(--saffron)">🌐</span> Website: <a href="https://eci.gov.in" target="_blank"
+                rel="noopener noreferrer" style="color:var(--saffron)">eci.gov.in</a><br>
               <span style="color:var(--saffron)">📧</span> complaints@eci.gov.in
             </p>
           </div>
@@ -634,11 +1350,16 @@
         <div>
           <div class="eci-info">
             <h3>Quick Links</h3>
-            <a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">🗳️ Voter Registration Portal</a>
-            <a href="https://electoralsearch.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">🔍 Find Your Booth</a>
-            <a href="https://eci.gov.in/candidate-political-parties/list-of-political-parties" target="_blank" rel="noopener noreferrer" class="eci-link">🎌 Recognised Parties</a>
-            <a href="https://results.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📊 Election Results</a>
-            <a href="https://affidavit.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📄 Candidate Affidavits</a>
+            <a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">🗳️ Voter
+              Registration Portal</a>
+            <a href="https://electoralsearch.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">🔍
+              Find Your Booth</a>
+            <a href="https://eci.gov.in/candidate-political-parties/list-of-political-parties" target="_blank"
+              rel="noopener noreferrer" class="eci-link">🎌 Recognised Parties</a>
+            <a href="https://results.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📊 Election
+              Results</a>
+            <a href="https://affidavit.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📄
+              Candidate Affidavits</a>
           </div>
           <div style="margin-top:1rem;" class="eci-info">
             <h3>Helplines</h3>
@@ -683,9 +1404,14 @@
             </div>
             <div class="chat-input-area">
               <label for="chat-input" class="sr-only">Type your question</label>
-              <textarea id="chat-input" rows="1" placeholder="Ask about elections… / चुनाव के बारे में पूछें…" maxlength="1000" aria-label="Message input"></textarea>
+              <textarea id="chat-input" rows="1" placeholder="Ask about elections… / चुनाव के बारे में पूछें…"
+                maxlength="1000" aria-label="Message input"></textarea>
               <button id="send-btn" aria-label="Send message" title="Send (Enter)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
               </button>
             </div>
           </div>
@@ -721,6 +1447,43 @@
       </div>
     </section>
 
+    <!-- PARLIAMENT -->
+    <section class="panel" id="panel-parliament" role="tabpanel" aria-label="Parliament of India">
+      <h2 class="section-title">Parliament of India</h2>
+      <div id="parliament-content">
+        <div class="loading-state">Loading…</div>
+      </div>
+    </section>
+
+    <!-- STATES AND UTs -->
+    <section class="panel" id="panel-states" role="tabpanel" aria-label="States and Union Territories">
+      <h2 class="section-title">States &amp; Union Territories</h2>
+      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.25rem;" role="group" aria-label="Filter">
+        <button class="filter-pill active" data-filter="all" onclick="filterStates(this)">All (36)</button>
+        <button class="filter-pill" data-filter="state" onclick="filterStates(this)">States (28)</button>
+        <button class="filter-pill" data-filter="ut" onclick="filterStates(this)">UTs (8)</button>
+        <button class="filter-pill" data-filter="North" onclick="filterStates(this)">North</button>
+        <button class="filter-pill" data-filter="South" onclick="filterStates(this)">South</button>
+        <button class="filter-pill" data-filter="East" onclick="filterStates(this)">East</button>
+        <button class="filter-pill" data-filter="West" onclick="filterStates(this)">West</button>
+        <button class="filter-pill" data-filter="North East" onclick="filterStates(this)">North East</button>
+        <button class="filter-pill" data-filter="Central" onclick="filterStates(this)">Central</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <div id="states-content">
+          <div class="loading-state">Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRESIDENT -->
+    <section class="panel" id="panel-president" role="tabpanel" aria-label="President of India">
+      <h2 class="section-title">President &amp; Vice President of India</h2>
+      <div id="president-content">
+        <div class="loading-state">Loading…</div>
+      </div>
+    </section>
+
     <!-- TRANSLATE ────────────────────────────────────────────── -->
     <section class="panel" id="panel-translate" role="tabpanel" aria-label="Translate">
       <h2 class="section-title">Translate Election Content</h2>
@@ -728,7 +1491,8 @@
         <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem;">
           Translate any election-related text into major Indian languages using Google Gemini.
         </p>
-        <label for="translate-lang" style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Target Language</label>
+        <label for="translate-lang"
+          style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Target Language</label>
         <select id="translate-lang" aria-label="Select target language">
           <option value="hindi">हिंदी (Hindi)</option>
           <option value="tamil">தமிழ் (Tamil)</option>
@@ -739,8 +1503,11 @@
           <option value="gujarati">ગુજરાતી (Gujarati)</option>
           <option value="punjabi">ਪੰਜਾਬੀ (Punjabi)</option>
         </select>
-        <label for="translate-input" style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Text to Translate</label>
-        <textarea id="translate-input" rows="4" placeholder="Enter election-related text to translate… e.g. 'To vote, bring your Voter ID card to the polling booth.'" maxlength="1000" aria-label="Text to translate"></textarea>
+        <label for="translate-input"
+          style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Text to Translate</label>
+        <textarea id="translate-input" rows="4"
+          placeholder="Enter election-related text to translate… e.g. 'To vote, bring your Voter ID card to the polling booth.'"
+          maxlength="1000" aria-label="Text to translate"></textarea>
         <button class="btn btn-primary" id="translate-btn" onclick="doTranslate()">Translate with Gemini</button>
         <div class="translate-result" id="translate-result" aria-live="polite" aria-label="Translation result">
           Translation will appear here…
@@ -772,8 +1539,8 @@
      */
     function escHtml(str) {
       return String(str)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     /**
@@ -791,21 +1558,24 @@
 
     /* ── Navigation ─────────────────────────────────────────── */
     const navBtns = document.querySelectorAll('.nav-btn');
-    const panels  = document.querySelectorAll('.panel');
+    const panels = document.querySelectorAll('.panel');
 
     navBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const target = btn.dataset.panel;
-        navBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+        navBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
         panels.forEach(p => p.classList.remove('active'));
-        btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+        btn.classList.add('active'); btn.setAttribute('aria-selected', 'true');
         document.getElementById('panel-' + target).classList.add('active');
 
-        if (target === 'quiz'     && !quizLoaded) initQuiz();
-        if (target === 'dates'    && !datesLoaded) loadDates();
-        if (target === 'updates'  && !annLoaded)  loadAnnouncements();
+        if (target === 'quiz' && !quizLoaded) initQuiz();
+        if (target === 'parliament' && !parliamentLoaded) loadParliament();
+        if (target === 'states' && !statesLoaded) loadStates();
+        if (target === 'president' && !presidentLoaded) loadPresident();
+        if (target === 'dates' && !datesLoaded) loadDates();
+        if (target === 'updates' && !annLoaded) loadAnnouncements();
         if (target === 'how-to-vote' && !stepsLoaded) loadSteps();
-        if (target === 'register'    && !stepsLoaded) loadSteps();
+        if (target === 'register' && !stepsLoaded) loadSteps();
 
         // GA4 event
         if (typeof gtag !== 'undefined') gtag('event', 'tab_view', { tab_name: target });
@@ -817,7 +1587,7 @@
 
     async function initFirebase() {
       try {
-        const res  = await fetch('/api/config');
+        const res = await fetch('/api/config');
         const data = await res.json();
         if (!data.firebase.apiKey) return;
 
@@ -858,7 +1628,7 @@
     /* ── Load Election Data ──────────────────────────────────── */
     async function loadHomeData() {
       try {
-        const res  = await fetch('/api/election');
+        const res = await fetch('/api/election');
         const data = await res.json();
 
         // Facts grid
@@ -886,7 +1656,7 @@
     async function loadSteps() {
       if (stepsLoaded) return;
       try {
-        const res  = await fetch('/api/steps');
+        const res = await fetch('/api/steps');
         const data = await res.json();
         stepsLoaded = true;
 
@@ -918,17 +1688,17 @@
     }
 
     /* ── Quiz Engine ─────────────────────────────────────────── */
-    let quizLoaded   = false;
-    let questions    = [];
-    let currentQ     = 0;
-    let answers      = [];
-    let answered     = false;
+    let quizLoaded = false;
+    let questions = [];
+    let currentQ = 0;
+    let answers = [];
+    let answered = false;
     const SESSION_ID = Math.random().toString(36).slice(2);
 
     async function initQuiz() {
       if (quizLoaded) return;
       try {
-        const res  = await fetch('/api/quiz');
+        const res = await fetch('/api/quiz');
         const data = await res.json();
         questions = data.questions;
         quizLoaded = true;
@@ -939,7 +1709,7 @@
     }
 
     function renderQuestion() {
-      const q   = questions[currentQ];
+      const q = questions[currentQ];
       const pct = Math.round(((currentQ) / questions.length) * 100);
       const container = document.getElementById('quiz-container');
 
@@ -954,15 +1724,15 @@
         <div class="quiz-options" role="group" aria-labelledby="q-text">
           ${q.options.map((opt, i) => `
             <button class="quiz-option" data-index="${i}" onclick="selectAnswer(${i})"
-              aria-label="Option ${i+1}: ${escHtml(opt)}">
-              ${String.fromCharCode(65+i)}. ${escHtml(opt)}
+              aria-label="Option ${i + 1}: ${escHtml(opt)}">
+              ${String.fromCharCode(65 + i)}. ${escHtml(opt)}
             </button>
           `).join('')}
         </div>
         <div class="quiz-explain" id="quiz-explain" aria-live="polite"></div>
         <div class="quiz-nav">
           <span style="font-family:var(--font-m);font-size:0.75rem;color:var(--text-3);">
-            Score: ${answers.filter(a=>a.correct).length}/${currentQ}
+            Score: ${answers.filter(a => a.correct).length}/${currentQ}
           </span>
           <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled aria-label="Next question">
             ${currentQ === questions.length - 1 ? 'See Results' : 'Next →'}
@@ -988,7 +1758,7 @@
           sessionId: SESSION_ID,
         }),
       }).then(r => r.json()).then(data => {
-        const result  = data.results[currentQ];
+        const result = data.results[currentQ];
         const correct = result.correct;
         const isRight = idx === correct;
 
@@ -1022,10 +1792,10 @@
     function showResults() {
       const score = answers.filter(a => a.isCorrect).length;
       const total = questions.length;
-      const pct   = Math.round((score / total) * 100);
-      const badge = pct >= 80 ? ['🏆 Election Expert!',    '#FFD700', 'rgba(255,215,0,0.15)']
-                  : pct >= 60 ? ['👍 Good Knowledge!',     '#138808', 'rgba(19,136,8,0.15)']
-                  :             ['📚 Keep Learning!',       '#FF6B00', 'rgba(255,107,0,0.15)'];
+      const pct = Math.round((score / total) * 100);
+      const badge = pct >= 80 ? ['🏆 Election Expert!', '#FFD700', 'rgba(255,215,0,0.15)']
+        : pct >= 60 ? ['👍 Good Knowledge!', '#138808', 'rgba(19,136,8,0.15)']
+          : ['📚 Keep Learning!', '#FF6B00', 'rgba(255,107,0,0.15)'];
 
       document.getElementById('quiz-container').innerHTML = `
         <div class="quiz-result">
@@ -1034,8 +1804,8 @@
           <div class="result-badge" style="background:${badge[2]};color:${badge[1]};border:1px solid ${badge[1]};">${badge[0]}</div>
           <div style="margin-bottom:1.5rem;font-size:0.85rem;color:var(--text-2);">
             ${pct >= 80 ? "Excellent! You have a strong understanding of Indian democracy." :
-              pct >= 60 ? "Good effort! Review the How to Vote section to learn more." :
-                          "Keep learning! Explore the AI Assistant to get answers about elections."}
+          pct >= 60 ? "Good effort! Review the How to Vote section to learn more." :
+            "Keep learning! Explore the AI Assistant to get answers about elections."}
           </div>
           <button class="btn btn-primary" onclick="retakeQuiz()" aria-label="Retake quiz">🔄 Retake Quiz</button>
         </div>
@@ -1046,7 +1816,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answers: answers.map(a => a.idx), sessionId: SESSION_ID }),
-      }).catch(() => {});
+      }).catch(() => { });
     }
 
     function retakeQuiz() {
@@ -1062,7 +1832,7 @@
       datesLoaded = true;
       const list = document.getElementById('dates-list');
       try {
-        const res  = await fetch('/api/dates');
+        const res = await fetch('/api/dates');
         const data = await res.json();
         list.innerHTML = data.dates.map(d => `
           <div class="date-card" role="listitem">
@@ -1088,7 +1858,7 @@
       annLoaded = true;
       const list = document.getElementById('ann-list');
       try {
-        const res  = await fetch('/api/announcements');
+        const res = await fetch('/api/announcements');
         const data = await res.json();
         const icons = { info: 'ℹ️', success: '✅', warning: '⚠️' };
         list.innerHTML = data.announcements.map(a => `
@@ -1104,11 +1874,11 @@
     }
 
     /* ── Chat ────────────────────────────────────────────────── */
-    const chatInput  = document.getElementById('chat-input');
-    const sendBtn    = document.getElementById('send-btn');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
     const messagesEl = document.getElementById('chat-messages');
-    let chatHistory  = [];
-    let isBotTyping  = false;
+    let chatHistory = [];
+    let isBotTyping = false;
 
     function appendMsg(role, text) {
       const div = document.createElement('div');
@@ -1150,7 +1920,7 @@
       if (analytics) analytics.logEvent('chat_message', { message_length: trimmed.length });
 
       try {
-        const res  = await fetch('/api/chat', {
+        const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: trimmed, history: chatHistory }),
@@ -1162,7 +1932,7 @@
           appendMsg('bot', '⚠️ ' + data.error);
         } else {
           appendMsg('bot', data.reply);
-          chatHistory.push({ role: 'user',  text: trimmed });
+          chatHistory.push({ role: 'user', text: trimmed });
           chatHistory.push({ role: 'model', text: data.reply });
           if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
         }
@@ -1194,10 +1964,10 @@
 
     /* ── Translate ───────────────────────────────────────────── */
     async function doTranslate() {
-      const text     = document.getElementById('translate-input').value.trim();
+      const text = document.getElementById('translate-input').value.trim();
       const language = document.getElementById('translate-lang').value;
       const resultEl = document.getElementById('translate-result');
-      const btn      = document.getElementById('translate-btn');
+      const btn = document.getElementById('translate-btn');
 
       if (!text) { resultEl.textContent = 'Please enter text to translate.'; return; }
 
@@ -1205,7 +1975,7 @@
       resultEl.textContent = 'Translating with Gemini…';
 
       try {
-        const res  = await fetch('/api/translate', {
+        const res = await fetch('/api/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text, language }),
@@ -1219,6 +1989,158 @@
       }
     }
 
+
+    /* ── Parliament ──────────────────────────────────────────── */
+    let parliamentLoaded = false;
+
+    async function loadParliament() {
+      if (parliamentLoaded) return;
+      parliamentLoaded = true;
+      const el = document.getElementById('parliament-content');
+      try {
+        const res = await fetch('/api/parliament');
+        const data = await res.json();
+        const ls = data.lokSabha;
+        const rs = data.rajyaSabha;
+
+        el.innerHTML = `
+          <div class="parl-grid">
+            <div class="parl-card">
+              <h3>🏛️ Lok Sabha — ${ls.totalSeats} Seats</h3>
+              <div class="parl-stat"><span class="label">Full Name</span><span class="value">${escHtml(ls.fullName)}</span></div>
+              <div class="parl-stat"><span class="label">Term</span><span class="value">${escHtml(ls.term)}</span></div>
+              <div class="parl-stat"><span class="label">Current</span><span class="value">${escHtml(ls.currentTerm)}</span></div>
+              <div class="parl-stat"><span class="label">Elected By</span><span class="value">${escHtml(ls.electedBy)}</span></div>
+              <div class="parl-stat"><span class="label">Eligibility</span><span class="value">${escHtml(ls.eligibility)}</span></div>
+              <div class="parl-stat"><span class="label">Speaker</span><span class="value">${escHtml(ls.speaker)}</span></div>
+              <div class="parl-stat"><span class="label">Reserved Seats</span><span class="value">${escHtml(ls.specialSeats)}</span></div>
+              <div style="margin-top:0.75rem;">
+                <div style="font-size:0.75rem;color:var(--text-3);margin-bottom:0.5rem;font-family:var(--font-m);">KEY FUNCTIONS</div>
+                <ul class="pres-list">${ls.keyFunctions.map(f => '<li>' + escHtml(f) + '</li>').join('')}</ul>
+              </div>
+            </div>
+            <div class="parl-card">
+              <h3>🏛️ Rajya Sabha — ${rs.totalSeats} Seats</h3>
+              <div class="parl-stat"><span class="label">Full Name</span><span class="value">${escHtml(rs.fullName)}</span></div>
+              <div class="parl-stat"><span class="label">Term</span><span class="value">${escHtml(rs.term)}</span></div>
+              <div class="parl-stat"><span class="label">Elected Seats</span><span class="value">${rs.electedSeats}</span></div>
+              <div class="parl-stat"><span class="label">Nominated</span><span class="value">${rs.nominatedSeats} (expertise in art/science/literature)</span></div>
+              <div class="parl-stat"><span class="label">Elected By</span><span class="value">${escHtml(rs.electedBy)}</span></div>
+              <div class="parl-stat"><span class="label">Eligibility</span><span class="value">${escHtml(rs.eligibility)}</span></div>
+              <div class="parl-stat"><span class="label">Chairman</span><span class="value">${escHtml(rs.chairman)}</span></div>
+              <div class="parl-stat"><span class="label">Permanent?</span><span class="value">Yes — never dissolved</span></div>
+              <div style="margin-top:0.75rem;">
+                <div style="font-size:0.75rem;color:var(--text-3);margin-bottom:0.5rem;font-family:var(--font-m);">TOP STATE ALLOCATIONS</div>
+                ${rs.stateSeats.slice(0, 6).map(s => `<div class="parl-stat"><span class="label">${escHtml(s.state)}</span><span class="value">${s.seats} seats</span></div>`).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      } catch (e) { el.innerHTML = '<div class="error-state">Failed to load parliament data.</div>'; }
+    }
+
+    /* ── States ──────────────────────────────────────────────── */
+    let statesLoaded = false;
+    let allStates = [];
+
+    async function loadStates() {
+      if (statesLoaded) return;
+      statesLoaded = true;
+      const el = document.getElementById('states-content');
+      try {
+        const res = await fetch('/api/states');
+        const data = await res.json();
+        allStates = data.states;
+        renderStates(allStates);
+      } catch (e) { el.innerHTML = '<div class="error-state">Failed to load states data.</div>'; }
+    }
+
+    function renderStates(states) {
+      const el = document.getElementById('states-content');
+      el.innerHTML = `
+        <table class="states-table" role="table" aria-label="States and UTs electoral data">
+          <thead>
+            <tr>
+              <th>Name</th><th>Capital</th><th>Type</th>
+              <th>Vidhan Sabha</th><th>Lok Sabha</th><th>Rajya Sabha</th><th>Region</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${states.map(s => `
+              <tr>
+                <td>${escHtml(s.name)}</td>
+                <td style="color:var(--text-2)">${escHtml(s.capital)}</td>
+                <td><span class="state-badge ${s.type === 'state' ? 'badge-state' : 'badge-ut'}">${s.type.toUpperCase()}</span></td>
+                <td style="font-family:var(--font-m);font-size:0.78rem;color:var(--saffron)">${escHtml(String(s.vidhanSabhaSeats))}</td>
+                <td style="font-family:var(--font-m);font-size:0.78rem;color:var(--green)">${s.lokSabhaSeats}</td>
+                <td style="font-family:var(--font-m);font-size:0.78rem;color:var(--gold)">${s.rajyaSabhaSeats}</td>
+                <td style="color:var(--text-3);font-size:0.75rem">${escHtml(s.region)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div style="margin-top:0.75rem;font-family:var(--font-m);font-size:0.72rem;color:var(--text-3);">
+          Showing ${states.length} of 36 states/UTs
+        </div>
+      `;
+    }
+
+    function filterStates(btn) {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      if (f === 'all') { renderStates(allStates); return; }
+      if (f === 'state') { renderStates(allStates.filter(s => s.type === 'state')); return; }
+      if (f === 'ut') { renderStates(allStates.filter(s => s.type === 'ut')); return; }
+      renderStates(allStates.filter(s => s.region === f));
+    }
+
+    /* ── President ───────────────────────────────────────────── */
+    let presidentLoaded = false;
+
+    async function loadPresident() {
+      if (presidentLoaded) return;
+      presidentLoaded = true;
+      const el = document.getElementById('president-content');
+      try {
+        const res = await fetch('/api/president');
+        const p = await res.json();
+
+        el.innerHTML = `
+          <div class="pres-grid">
+            <div class="pres-card">
+              <h3>🇮🇳 ${escHtml(p.title)}</h3>
+              <div class="parl-stat"><span class="label">Current</span><span class="value">${escHtml(p.currentPresident)}</span></div>
+              <div class="parl-stat"><span class="label">Term</span><span class="value">${escHtml(p.term)}</span></div>
+              <div class="parl-stat"><span class="label">Elected By</span><span class="value">${escHtml(p.electedBy)}</span></div>
+              <div class="parl-stat"><span class="label">Voting System</span><span class="value">${escHtml(p.votingSystem)}</span></div>
+              <div style="margin-top:0.75rem;">
+                <div style="font-size:0.75rem;color:var(--text-3);margin-bottom:0.5rem;font-family:var(--font-m);">ELIGIBILITY</div>
+                <ul class="pres-list">${p.eligibility.map(e => '<li>' + escHtml(e) + '</li>').join('')}</ul>
+              </div>
+            </div>
+            <div class="pres-card">
+              <h3>🏛️ Election Process</h3>
+              ${p.process.map(s => `<div class="parl-stat"><span class="label">Step ${s.step}: ${escHtml(s.title)}</span><span class="value" style="text-align:right;max-width:200px">${escHtml(s.desc)}</span></div>`).join('')}
+            </div>
+          </div>
+          <div class="pres-grid">
+            <div class="pres-card">
+              <h3>⚡ Presidential Powers</h3>
+              <ul class="pres-list">${p.powers.map(pw => '<li>' + escHtml(pw) + '</li>').join('')}</ul>
+            </div>
+            <div class="pres-card">
+              <h3>🎖️ Vice President</h3>
+              <div class="parl-stat"><span class="label">Current</span><span class="value">${escHtml(p.vicePresident.current)}</span></div>
+              <div class="parl-stat"><span class="label">Term</span><span class="value">${escHtml(p.vicePresident.term)}</span></div>
+              <div class="parl-stat"><span class="label">Role</span><span class="value">${escHtml(p.vicePresident.role)}</span></div>
+              <div class="parl-stat"><span class="label">Elected By</span><span class="value">${escHtml(p.vicePresident.electedBy)}</span></div>
+            </div>
+          </div>
+        `;
+      } catch (e) { el.innerHTML = '<div class="error-state">Failed to load president data.</div>'; }
+    }
+
     /* ── Init ────────────────────────────────────────────────── */
     initFirebase();
     loadHomeData();
@@ -1226,4 +2148,5 @@
   </script>
 
 </body>
+
 </html>

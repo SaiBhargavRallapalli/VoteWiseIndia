@@ -239,6 +239,27 @@
               <div>Helpline: <span style="color:var(--saffron)">1950</span></div>
             </div>
           </div>
+          <div class="sidebar-card">
+            <div class="sidebar-title">🔬 Text Analyser</div>
+            <p style="font-size:0.75rem;color:var(--text-2);margin-bottom:0.6rem;line-height:1.5;">
+              Google Natural Language API — extract entities &amp; sentiment from election text.
+            </p>
+            <label for="analyze-input" class="sr-only">Election text to analyse</label>
+            <textarea id="analyze-input" rows="3"
+              style="width:100%;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:0.5rem;font-family:var(--font-b);font-size:0.78rem;resize:none;outline:none;margin-bottom:0.5rem;"
+              placeholder="e.g. The Election Commission of India conducts Lok Sabha elections…"
+              maxlength="500"
+              aria-label="Election text to analyse"></textarea>
+            <button onclick="doAnalyze()" class="btn btn-primary"
+              style="width:100%;font-size:0.78rem;padding:0.5rem;"
+              aria-label="Analyse text with Google Natural Language API">
+              Analyse with NL API
+            </button>
+            <div id="analyze-result"
+              style="margin-top:0.6rem;font-size:0.75rem;color:var(--text-2);font-family:var(--font-m);line-height:1.8;white-space:pre-wrap;"
+              aria-live="polite" aria-label="Analysis result">
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -331,7 +352,6 @@
   </main>
 
   <script type="module" src="app.js"></script>
-
 
 </body>
 

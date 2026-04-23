@@ -94,6 +94,16 @@ async function initFirebase() {
         btn.style.color = 'var(--saffron)';
       }
     });
+    // Handle redirect result after Google sign-in completes
+    auth.getRedirectResult().then(result => {
+      if (result && result.user) {
+        console.log('Signed in:', result.user.displayName);
+      }
+    }).catch(e => {
+      if (e.code !== 'auth/no-auth-event') {
+        console.error('Redirect result:', e.code, e.message);
+      }
+    });
   } catch (e) { console.warn('Firebase init:', e.message); }
 }
 
@@ -108,7 +118,7 @@ function handleAuth() {
     auth.signOut();
   } else {
     const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(e => {
+    auth.signInWithRedirect(provider).catch(e => {
       console.error('Auth:', e.code, e.message);
       const btn = document.getElementById('auth-btn');
       const msg = authErrorButtonLabel(e);

@@ -6,8 +6,10 @@ node_modules/
 .env.local
 .env.*.local
 
-# Test coverage (generated)
+# Test coverage & reports (generated)
 coverage/
+playwright-report/
+test-results/
 
 # Logs
 *.log

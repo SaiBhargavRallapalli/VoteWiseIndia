@@ -101,10 +101,10 @@ How this submission addresses each evaluation axis:
 
 | Axis | Where to see it |
 |---|---|
-| **Code Quality** | `server.js` is fully JSDoc-annotated with modular helpers and no inline secrets. Consistent ESM-style patterns, structured routes, clear separation of cache / validation / handler layers. |
+| **Code Quality** | `server.js` is fully JSDoc-annotated with modular helpers and no inline secrets. **Modular frontend**: `index.html` (340 lines pure HTML), `app.js` (840 lines JS), `styles.css` (1750 lines CSS). Consistent patterns, structured routes, clear separation of cache / validation / handler layers. |
 | **Security** | `helmet` (CSP-ready headers), `cors` with origin allow-list env var, `express-rate-limit` on mutative routes, `.env` gitignored, server-side secret proxying (Gemini key never reaches browser), HTML escaping (`escHtml`) on every rendered string to prevent XSS, OAuth 2.0 via Firebase. |
 | **Efficiency** | 25 s in-memory response cache, gzip via `compression`, static asset caching, lazy panel rendering (quiz/parliament/states/etc. fetch only when opened), debounced animations, single-page architecture avoids redundant network. |
-| **Testing** | **66 Jest + Supertest tests, 90.39 % line coverage** covering every API route, error paths, cache headers, rate limits, input validation, and edge cases. Run with `npm test`. |
+| **Testing** | **66 Jest + Supertest API tests** covering every route, error path, cache header, rate limit, and edge case. **30 Playwright E2E browser tests** covering navigation, quiz flow, chat, and accessibility. Run with `npm test` (API) and `npm run test:e2e` (browser). |
 | **Accessibility** | Skip-to-content link, `aria-label` on every interactive element, `aria-live` regions for chat/quiz/translations, semantic HTML5 landmarks, WCAG 2.1 AA contrast, full keyboard nav, `prefers-reduced-motion` CSS media query disables every animation for users who need it. |
 | **Google Services** | 10 services integrated meaningfully (not just namedropped) — see table above. |
 
@@ -128,9 +128,17 @@ How this submission addresses each evaluation axis:
 ```
 VoteWiseIndia/
 ├── server.js           # Express backend (987 lines) — full JSDoc, modular
-├── server.test.js      # Jest + Supertest — 66 tests across 13 describe blocks
+├── server.test.js      # Jest + Supertest — 66 API tests
 ├── public/
-│   └── index.html      # SPA frontend — bilingual, accessible, animated
+│   ├── index.html      # SPA markup (340 lines) — semantic, accessible
+│   ├── styles.css      # Design system & components (1750 lines)
+│   └── app.js          # Frontend logic (840 lines) — quiz, chat, nav
+├── e2e/
+│   ├── navigation.spec.js   # 8 navigation & page load tests
+│   ├── quiz.spec.js         # 6 quiz interaction tests
+│   ├── chat.spec.js         # 7 chat assistant tests
+│   └── accessibility.spec.js # 9 ARIA & keyboard tests
+├── playwright.config.js # E2E test configuration
 ├── Dockerfile          # Cloud Run deployment (non-root, healthcheck)
 ├── .dockerignore       # Keeps secrets & test files out of the image
 ├── package.json        # Dependencies + scripts
@@ -152,8 +160,15 @@ cp .env.example .env
 npm start
 # → http://localhost:8080
 
-# Run the test suite (66 tests)
+# Run API tests (66 tests)
 npm test
+
+# Run E2E browser tests (30 tests)
+npx playwright install   # first time only
+npm run test:e2e
+
+# Run all tests
+npm run test:all
 
 # Or with Docker (mirrors Cloud Run)
 docker build -t votewise-india .

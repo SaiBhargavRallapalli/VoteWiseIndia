@@ -1,3 +1,12 @@
+/**
+ * @file app.js
+ * @description VoteWise India — Frontend Application Logic
+ * Navigation, Firebase init, quiz engine, AI chat, translation,
+ * state/parliament data renderers, and scroll-reveal animations.
+ */
+
+'use strict';
+
 /* ── Utilities ──────────────────────────────────────────── */
 /**
  * Escapes HTML special characters to prevent XSS.
@@ -826,3 +835,9 @@ window.addEventListener('load', () => {
   loadHomeData();
   loadSteps();
 });
+
+// ── Expose functions required by inline onclick handlers ──────────────────
+window.handleAuth = handleAuth;
+window.filterStates = filterStates;
+window.retakeQuiz = retakeQuiz;
+window.doTranslate = doTranslate;

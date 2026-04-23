@@ -178,6 +178,14 @@ docker build -t votewise-india .
 docker run -p 8080:8080 --env-file .env votewise-india
 ```
 
+### Google Sign-In (`Sign-in failed` or Firebase errors)
+
+1. **Enable Google provider:** Firebase console → **Build** → **Authentication** → **Sign-in method** → **Google** → **Enable** (and set a support email).
+2. **Authorized domains:** **Authentication** → **Settings** → **Authorized domains** must include the site you use (e.g. `localhost`, and your `*.run.app` URL after deploy). Add each domain you test on.
+3. **Web app config in `.env`:** Copy all values from **Project settings** → *Your apps* → Web app (`FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN` like `your-project.firebaseapp.com`, `FIREBASE_PROJECT_ID`, `storageBucket`, `messagingSenderId`, `appId`, `FIREBASE_MEASUREMENT_ID` if you use Analytics).
+4. **Restart the server** after changing `.env`. On Cloud Run, set the same variables on the service and **redeploy**.
+5. If the button shows an error like **`auth/...`**, open the browser **developer console (F12)** — the app logs the full Firebase `code` and `message` for that attempt.
+
 ---
 
 ## Deploy to Google Cloud Run

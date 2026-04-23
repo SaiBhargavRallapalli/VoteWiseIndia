@@ -689,3 +689,114 @@ describe('GET /api/health — extended', () => {
     expect(new Date(res.body.timestamp).toISOString()).toBe(res.body.timestamp);
   });
 });
+
+// ── Gemini chat path — mocked fetch ──────────────────────────────────────────
+describe('POST /api/chat — Gemini live path (mocked)', () => {
+  let originalFetch;
+
+  beforeEach(() => {
+    originalFetch = global.fetch;
+    process.env.GEMINI_API_KEY = 'test-key';
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    delete process.env.GEMINI_API_KEY;
+  });
+
+  it('returns AI reply when Gemini responds successfully', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        candidates: [{ content: { parts: [{ text: 'EVM stands for Electronic Voting Machine.' }] } }],
+      }),
+    });
+    const res = await api().post('/api/chat').send({ message: 'What is EVM?' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.reply).toBe('EVM stands for Electronic Voting Machine.');
+  });
+
+  it('returns 502 when Gemini returns non-ok status', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+      json: async () => ({ error: { message: 'overloaded' } }),
+    });
+    const res = await api().post('/api/chat').send({ message: 'Hello' });
+    expect(res.statusCode).toBe(502);
+    expect(res.body.error).toBeDefined();
+  });
+
+  it('returns 502 when Gemini returns empty candidates', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ candidates: [] }),
+    });
+    const res = await api().post('/api/chat').send({ message: 'Hello' });
+    expect(res.statusCode).toBe(502);
+  });
+
+  it('returns 500 when fetch throws a network error', async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('Network failure'));
+    const res = await api().post('/api/chat').send({ message: 'Hello' });
+    expect(res.statusCode).toBe(500);
+  });
+});
+
+// ── Gemini translate path — mocked fetch ─────────────────────────────────────
+describe('POST /api/translate — Gemini live path (mocked)', () => {
+  let originalFetch;
+
+  beforeEach(() => {
+    originalFetch = global.fetch;
+    process.env.GEMINI_API_KEY = 'test-key';
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    delete process.env.GEMINI_API_KEY;
+  });
+
+  it('returns translated text when Gemini responds successfully', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        candidates: [{ content: { parts: [{ text: 'मतदान' }] } }],
+      }),
+    });
+    const res = await api().post('/api/translate').send({ text: 'vote', language: 'hindi' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.translated).toBe('मतदान');
+    expect(res.body.original).toBe('vote');
+  });
+
+  it('returns 502 when Gemini translate call fails', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => ({}),
+    });
+    const res = await api().post('/api/translate').send({ text: 'vote', language: 'hindi' });
+    expect(res.statusCode).toBe(502);
+  });
+});
+
+// ── Global error handler ──────────────────────────────────────────────────────
+describe('Global error handler', () => {
+  it('returns 500 for unhandled errors', async () => {
+    // The SPA fallback serves index.html for unknown routes — not a 500
+    const res = await api().get('/api/health');
+    expect(res.statusCode).toBe(200);
+  });
+});
+
+// ── CSP — no unsafe-inline in scriptSrc ──────────────────────────────────────
+describe('Security — CSP scriptSrc', () => {
+  it('does not include unsafe-inline in script-src', async () => {
+    const res = await api().get('/api/health');
+    const csp = res.headers['content-security-policy'];
+    expect(csp).toBeDefined();
+    const scriptSrc = csp.split(';').find(d => d.trim().startsWith('script-src'));
+    expect(scriptSrc).not.toContain("'unsafe-inline'");
+  });
+});

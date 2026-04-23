@@ -392,18 +392,20 @@ async function showResults() {
             </div>
           `).join('')}
         </div>
-        <button class="btn btn-primary" onclick="retakeQuiz()" style="margin-top:1.5rem;" aria-label="Retake quiz">🔄 Retake Quiz</button>
+        <button class="btn btn-primary" id="retake-btn" style="margin-top:1.5rem;" aria-label="Retake quiz">🔄 Retake Quiz</button>
       </div>
     `;
 
     if (analytics) analytics.logEvent('quiz_complete', { score: pct });
+    document.getElementById('retake-btn')?.addEventListener('click', retakeQuiz);
   } catch (e) {
     container.innerHTML = `
       <div class="quiz-result">
         <div class="result-label">Quiz complete!</div>
-        <button class="btn btn-primary" onclick="retakeQuiz()" style="margin-top:1rem;">🔄 Retake Quiz</button>
+        <button class="btn btn-primary" id="retake-btn" style="margin-top:1rem;">🔄 Retake Quiz</button>
       </div>
     `;
+    document.getElementById('retake-btn')?.addEventListener('click', retakeQuiz);
   }
 }
 
@@ -827,16 +829,18 @@ function applyLang(lang) {
 
 document.getElementById('lang-select').addEventListener('change', e => applyLang(e.target.value));
 
+document.getElementById('auth-btn').addEventListener('click', handleAuth);
+
+document.getElementById('translate-btn').addEventListener('click', doTranslate);
+
+document.querySelector('.filter-pills-group')?.addEventListener('click', e => {
+  const btn = e.target.closest('.filter-pill');
+  if (btn) filterStates(btn);
+});
+
 /* ── Final Initialization ────────────────────────────────── */
 window.addEventListener('load', () => {
-  console.log('🎉 VoteWise India v5.0 - Hackathon Optimized');
   initFirebase();
   loadHomeData();
   loadSteps();
 });
-
-// ── Expose functions required by inline onclick handlers ──────────────────
-window.handleAuth = handleAuth;
-window.filterStates = filterStates;
-window.retakeQuiz = retakeQuiz;
-window.doTranslate = doTranslate;

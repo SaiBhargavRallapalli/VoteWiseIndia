@@ -32,7 +32,7 @@
           <option value="en">English</option>
           <option value="hi">हिंदी</option>
         </select>
-        <button id="auth-btn" onclick="handleAuth()">Sign in with Google</button>
+        <button id="auth-btn">Sign in with Google</button>
       </div>
     </div>
   </header>
@@ -208,7 +208,8 @@
             <div class="chat-input-area">
               <label for="chat-input" class="sr-only">Type your question</label>
               <textarea id="chat-input" rows="1" placeholder="Ask about elections… / चुनाव के बारे में पूछें…"
-                maxlength="1000" aria-label="Message input"></textarea>
+                maxlength="1000" aria-label="Message input" aria-describedby="chat-hint"></textarea>
+              <span id="chat-hint" class="sr-only">Press Enter to send, Shift+Enter for new line. Maximum 1000 characters.</span>
               <button id="send-btn" aria-label="Send message" title="Send (Enter)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"
                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -261,16 +262,16 @@
     <!-- STATES AND UTs -->
     <section class="panel" id="panel-states" role="tabpanel" aria-label="States and Union Territories">
       <h2 class="section-title">States &amp; Union Territories</h2>
-      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.25rem;" role="group" aria-label="Filter">
-        <button class="filter-pill active" data-filter="all" onclick="filterStates(this)">All (36)</button>
-        <button class="filter-pill" data-filter="state" onclick="filterStates(this)">States (28)</button>
-        <button class="filter-pill" data-filter="ut" onclick="filterStates(this)">UTs (8)</button>
-        <button class="filter-pill" data-filter="North" onclick="filterStates(this)">North</button>
-        <button class="filter-pill" data-filter="South" onclick="filterStates(this)">South</button>
-        <button class="filter-pill" data-filter="East" onclick="filterStates(this)">East</button>
-        <button class="filter-pill" data-filter="West" onclick="filterStates(this)">West</button>
-        <button class="filter-pill" data-filter="North East" onclick="filterStates(this)">North East</button>
-        <button class="filter-pill" data-filter="Central" onclick="filterStates(this)">Central</button>
+      <div class="filter-pills-group" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.25rem;" role="group" aria-label="Filter states and territories">
+        <button class="filter-pill active" data-filter="all">All (36)</button>
+        <button class="filter-pill" data-filter="state">States (28)</button>
+        <button class="filter-pill" data-filter="ut">UTs (8)</button>
+        <button class="filter-pill" data-filter="North">North</button>
+        <button class="filter-pill" data-filter="South">South</button>
+        <button class="filter-pill" data-filter="East">East</button>
+        <button class="filter-pill" data-filter="West">West</button>
+        <button class="filter-pill" data-filter="North East">North East</button>
+        <button class="filter-pill" data-filter="Central">Central</button>
       </div>
       <div style="overflow-x:auto;">
         <div id="states-content">
@@ -310,8 +311,9 @@
           style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Text to Translate</label>
         <textarea id="translate-input" rows="4"
           placeholder="Enter election-related text to translate… e.g. 'To vote, bring your Voter ID card to the polling booth.'"
-          maxlength="1000" aria-label="Text to translate"></textarea>
-        <button class="btn btn-primary" id="translate-btn" onclick="doTranslate()">Translate with Gemini</button>
+          maxlength="1000" aria-label="Text to translate" aria-describedby="translate-hint"></textarea>
+        <span id="translate-hint" class="sr-only">Maximum 1000 characters. Select a target language above before translating.</span>
+        <button class="btn btn-primary" id="translate-btn">Translate with Gemini</button>
         <div class="translate-result" id="translate-result" aria-live="polite" aria-label="Translation result">
           Translation will appear here…
         </div>

@@ -38,7 +38,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'",
+      scriptSrc: ["'self'",
         'https://www.gstatic.com',
         'https://www.googletagmanager.com',
         'https://www.google-analytics.com'],
@@ -64,17 +64,21 @@ app.use(express.json({ limit: '10kb' }));
 
 // ── Rate Limiters ─────────────────────────────────────────────────────────────
 
+const isTest = process.env.NODE_ENV === 'test';
+
 /** Rate limiter for AI chat endpoint — 20 req/min per IP */
 const chatLimiter = rateLimit({
   windowMs: 60_000, max: 20,
   standardHeaders: true, legacyHeaders: false,
   message: { error: 'Too many requests. Please wait a moment.' },
+  skip: () => isTest,
 });
 
 /** General rate limiter for data endpoints — 100 req/min per IP */
 const apiLimiter = rateLimit({
   windowMs: 60_000, max: 100,
   message: { error: 'Too many requests.' },
+  skip: () => isTest,
 });
 
 // ── In-memory Response Cache ──────────────────────────────────────────────────
@@ -780,8 +784,12 @@ app.post('/api/quiz/submit', apiLimiter, async (req, res) => {
  * @desc   Returns top quiz scores from Firestore
  */
 app.get('/api/leaderboard', apiLimiter, async (_req, res) => {
+  const cached = getCached('leaderboard');
+  if (cached) return res.set('X-Cache', 'HIT').json(cached);
   const scores = await getTopScores(10);
-  res.json({ scores });
+  const payload = { scores };
+  setCache('leaderboard', payload);
+  res.set('X-Cache', 'MISS').json(payload);
 });
 
 /**

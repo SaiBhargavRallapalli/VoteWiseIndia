@@ -23,6 +23,13 @@ test.describe('Accessibility', () => {
     }
   });
 
+  test('nav uses WAI-ARIA tablist with aria-controls on each tab', async ({ page }) => {
+    const tablist = page.getByRole('tablist', { name: 'Application sections' });
+    await expect(tablist).toBeVisible();
+    await expect(page.locator('.nav-btn').first()).toHaveAttribute('aria-controls', 'panel-home');
+    await expect(page.getByRole('tab', { name: /How to Vote/i })).toHaveAttribute('aria-controls', 'panel-how-to-vote');
+  });
+
   test('all panels have role="tabpanel"', async ({ page }) => {
     const panels = page.locator('.panel');
     const count = await panels.count();

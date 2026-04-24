@@ -8,7 +8,7 @@
 [![Tests](https://img.shields.io/badge/Jest-162_tests-brightgreen)](./server.test.js)
 [![Coverage](https://img.shields.io/badge/coverage-91%25-brightgreen)](./server.test.js)
 [![E2E](https://img.shields.io/badge/Playwright-30_passing-blue)](./e2e)
-[![Google Services](https://img.shields.io/badge/Google_Services-9_integrated-blue)](./README.md)
+[![Google Services](https://img.shields.io/badge/Google_Services-13_integrated-blue)](./README.md)
 [![PromptWars](https://img.shields.io/badge/PromptWars-Virtual_2026-orange)](https://promptwars.in)
 
 **🌐 Live:** [votewise-india-901504497544.asia-south1.run.app](https://votewise-india-901504497544.asia-south1.run.app/)

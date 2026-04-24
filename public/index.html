@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
-    content="VoteWise India — Your AI-powered guide to Indian elections. Learn how to vote, register, and understand the democratic process." />
+    content="VoteWise India — Your AI-powered guide to Indian elections. Features Google Cloud Translation, Text-to-Speech, Vision API, Natural Language Analysis, BigQuery Analytics, and Gemini AI. Learn how to vote, register, and understand the democratic process." />
   <meta name="theme-color" content="#FF6B00" />
   <title>VoteWise India | Your Election Guide</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -105,14 +105,38 @@
     <section class="panel" id="panel-register" role="tabpanel" aria-label="Voter registration">
       <h2 class="section-title">How to Register as a Voter</h2>
       <div class="steps-list" id="reg-steps" role="list" aria-label="Registration steps"></div>
-      <div style="margin-top:1.5rem;" class="sidebar-card">
-        <div class="sidebar-title">🔗 Official Registration Links</div>
-        <a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📌
-          voters.eci.gov.in — Apply / Check Status</a>
-        <a href="https://electoralsearch.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">🔍
-          electoralsearch.eci.gov.in — Search Electoral Roll</a>
-        <a href="https://affidavit.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📄
-          affidavit.eci.gov.in — Candidate Affidavits</a>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;margin-top:1.5rem;">
+        <div class="sidebar-card">
+          <div class="sidebar-title">🔗 Official Registration Links</div>
+          <a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📌
+            voters.eci.gov.in — Apply / Check Status</a>
+          <a href="https://electoralsearch.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">🔍
+            electoralsearch.eci.gov.in — Search Electoral Roll</a>
+          <a href="https://affidavit.eci.gov.in" target="_blank" rel="noopener noreferrer" class="eci-link">📄
+            affidavit.eci.gov.in — Candidate Affidavits</a>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-title">📷 Voter ID Verification (Cloud Vision API)</div>
+          <p style="font-size:0.75rem;color:var(--text-2);margin-bottom:0.8rem;line-height:1.5;">
+            Upload your Voter ID card image to verify EPIC number using Google Cloud Vision OCR.
+          </p>
+          <label for="voter-id-upload" class="sr-only">Upload Voter ID image</label>
+          <input type="file" id="voter-id-upload" accept="image/*"
+            style="width:100%;font-size:0.75rem;color:var(--text-2);margin-bottom:0.6rem;"
+            aria-describedby="vision-hint" />
+          <span id="vision-hint" class="sr-only">Supported formats: JPG, PNG. Max 5MB.</span>
+          <button onclick="verifyVoterID()" class="btn btn-primary"
+            style="width:100%;font-size:0.78rem;padding:0.5rem;"
+            aria-label="Verify Voter ID with Cloud Vision API">
+            🔍 Extract Text with Vision API
+          </button>
+          <div id="vision-result"
+            style="margin-top:0.6rem;font-size:0.75rem;color:var(--text-2);font-family:var(--font-m);line-height:1.8;white-space:pre-wrap;"
+            aria-live="polite" aria-label="Vision API result">
+          </div>
+        </div>
       </div>
     </section>
 
@@ -312,31 +336,67 @@
     <!-- TRANSLATE ────────────────────────────────────────────── -->
     <section class="panel" id="panel-translate" role="tabpanel" aria-label="Translate">
       <h2 class="section-title">Translate Election Content</h2>
-      <div class="translate-box">
-        <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem;">
-          Translate any election-related text into major Indian languages using Google Gemini.
-        </p>
-        <label for="translate-lang"
-          style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Target Language</label>
-        <select id="translate-lang" aria-label="Select target language">
-          <option value="hindi">हिंदी (Hindi)</option>
-          <option value="tamil">தமிழ் (Tamil)</option>
-          <option value="telugu">తెలుగు (Telugu)</option>
-          <option value="kannada">ಕನ್ನಡ (Kannada)</option>
-          <option value="marathi">मराठी (Marathi)</option>
-          <option value="bengali">বাংলা (Bengali)</option>
-          <option value="gujarati">ગુજરાતી (Gujarati)</option>
-          <option value="punjabi">ਪੰਜਾਬੀ (Punjabi)</option>
-        </select>
-        <label for="translate-input"
-          style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Text to Translate</label>
-        <textarea id="translate-input" rows="4"
-          placeholder="Enter election-related text to translate… e.g. 'To vote, bring your Voter ID card to the polling booth.'"
-          maxlength="1000" aria-label="Text to translate" aria-describedby="translate-hint"></textarea>
-        <span id="translate-hint" class="sr-only">Maximum 1000 characters. Select a target language above before translating.</span>
-        <button class="btn btn-primary" id="translate-btn">Translate with Gemini</button>
-        <div class="translate-result" id="translate-result" aria-live="polite" aria-label="Translation result">
-          Translation will appear here…
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.5rem;">
+        <div class="translate-box">
+          <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem;">
+            Translate election text using <strong style="color:var(--saffron)">Google Cloud Translation API</strong> (with Gemini fallback).
+          </p>
+          <label for="translate-lang"
+            style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Target Language</label>
+          <select id="translate-lang" aria-label="Select target language">
+            <option value="hindi">हिंदी (Hindi)</option>
+            <option value="tamil">தமிழ் (Tamil)</option>
+            <option value="telugu">తెలుగు (Telugu)</option>
+            <option value="kannada">ಕನ್ನಡ (Kannada)</option>
+            <option value="marathi">मराठी (Marathi)</option>
+            <option value="bengali">বাংলা (Bengali)</option>
+            <option value="gujarati">ગુજરાતી (Gujarati)</option>
+            <option value="punjabi">ਪੰਜਾਬੀ (Punjabi)</option>
+            <option value="malayalam">മലയാളം (Malayalam)</option>
+            <option value="odia">ଓଡ଼ିଆ (Odia)</option>
+          </select>
+          <label for="translate-input"
+            style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Text to Translate</label>
+          <textarea id="translate-input" rows="4"
+            placeholder="Enter election-related text to translate… e.g. 'To vote, bring your Voter ID card to the polling booth.'"
+            maxlength="1000" aria-label="Text to translate" aria-describedby="translate-hint"></textarea>
+          <span id="translate-hint" class="sr-only">Maximum 1000 characters. Select a target language above before translating.</span>
+          <button class="btn btn-primary" id="translate-btn">🌐 Translate with Cloud API</button>
+          <div class="translate-result" id="translate-result" aria-live="polite" aria-label="Translation result">
+            Translation will appear here…
+          </div>
+        </div>
+
+        <div class="translate-box">
+          <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem;">
+            <strong style="color:var(--green)">🔊 Text-to-Speech</strong> — Listen to election content in Indian languages using <strong style="color:var(--saffron)">Google Cloud Text-to-Speech API</strong>.
+          </p>
+          <label for="tts-lang"
+            style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Voice Language</label>
+          <select id="tts-lang" aria-label="Select voice language">
+            <option value="en">English (India)</option>
+            <option value="hi">हिंदी (Hindi)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+            <option value="gu">ગુજરાતી (Gujarati)</option>
+            <option value="ml">മലയാളം (Malayalam)</option>
+          </select>
+          <label for="tts-input"
+            style="font-size:0.8rem;color:var(--text-2);display:block;margin-bottom:0.3rem;">Text to Speak</label>
+          <textarea id="tts-input" rows="4"
+            placeholder="Enter text to convert to speech… e.g. 'Voting is your right. Visit your polling booth on election day.'"
+            maxlength="500" aria-label="Text to speak" aria-describedby="tts-hint"></textarea>
+          <span id="tts-hint" class="sr-only">Maximum 500 characters. Select a language above.</span>
+          <button class="btn btn-primary" id="tts-btn" onclick="doTextToSpeech()">🔊 Generate Speech</button>
+          <div id="tts-result" style="margin-top:0.8rem;" aria-live="polite" aria-label="Audio output">
+            <audio id="tts-audio" controls style="width:100%;display:none;" aria-label="Generated speech audio"></audio>
+            <div id="tts-status" style="font-size:0.78rem;color:var(--text-2);font-family:var(--font-m);">
+              Audio will appear here…
+            </div>
+          </div>
         </div>
       </div>
     </section>

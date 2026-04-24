@@ -5,9 +5,10 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org)
 [![Google Gemini](https://img.shields.io/badge/Google-Gemini_API-blue)](https://ai.google.dev)
 [![Cloud Run](https://img.shields.io/badge/Google-Cloud_Run-blue)](https://cloud.google.com/run)
-[![Tests](https://img.shields.io/badge/Jest-99_passing-brightgreen)](./server.test.js)
-[![Coverage](https://img.shields.io/badge/coverage-~93%25-brightgreen)](./server.test.js)
+[![Tests](https://img.shields.io/badge/Jest-162_tests-brightgreen)](./server.test.js)
+[![Coverage](https://img.shields.io/badge/coverage-91%25-brightgreen)](./server.test.js)
 [![E2E](https://img.shields.io/badge/Playwright-30_passing-blue)](./e2e)
+[![Google Services](https://img.shields.io/badge/Google_Services-9_integrated-blue)](./README.md)
 [![PromptWars](https://img.shields.io/badge/PromptWars-Virtual_2026-orange)](https://promptwars.in)
 
 **🌐 Live:** [votewise-india-901504497544.asia-south1.run.app](https://votewise-india-901504497544.asia-south1.run.app/)
@@ -28,10 +29,11 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 **Design philosophy:**
 
 1. **Single page, zero friction** — No signup required to learn. Optional Google Sign-In only for quiz leaderboard.
-2. **Bilingual by default** — Every interaction works in English and हिंदी; translation to 8 regional languages via Gemini.
+2. **Multilingual by default** — Every interaction works in English and हिंदी; Cloud Translation to 10 regional languages; Text-to-Speech in 9 languages.
 3. **Authoritative, not political** — Content sourced from ECI / official references only. Never names parties or candidates.
-4. **Accessible** — WCAG 2.1 AA contrast, full keyboard navigation, `prefers-reduced-motion` respected, ARIA live regions, skip links.
-5. **Server-side secrets** — Gemini, Natural Language API, and Firestore credentials never leave the backend.
+4. **Accessible** — WCAG 2.1 AA contrast, full keyboard navigation, `prefers-reduced-motion` respected, ARIA live regions, skip links, TTS for audio output.
+5. **Server-side secrets** — All Google Cloud API keys (Gemini, Translation, TTS, Vision, NL, BigQuery) and Firestore credentials never leave the backend.
+6. **Graceful degradation** — All services run in demo mode if API keys are not configured.
 
 ---
 
@@ -41,12 +43,15 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 - 🔬 **Text Analyser** — Paste any election text; Google Cloud Natural Language API extracts named entities and sentiment in real time
 - 🗳️ **How to Vote** — 7-step interactive guide from checking registration to casting your vote
 - 📋 **Voter Registration** — 6-step guide with Form 6, document requirements, and official links
+- 📷 **Voter ID Verification** — Upload Voter ID card; Google Cloud Vision API extracts EPIC number via OCR
 - 🎯 **Election Quiz** — 10-question quiz with explanations; scores saved to Firestore leaderboard
 - 📍 **ECI Map** — Google Maps embed showing Election Commission of India HQ
 - 📅 **Election Dates** — Upcoming elections with Google Calendar deep-link integration
 - 🏛️ **Parliament & States** — Lok Sabha, Rajya Sabha, all 28 states + 8 UTs electoral data
 - 🇮🇳 **President & VP** — Election process, powers, eligibility
-- 🌐 **Translate** — Any election text → 8 Indian languages via Gemini
+- 🌐 **Translate** — Any election text → 10 Indian languages via Google Cloud Translation API (Gemini fallback)
+- 🔊 **Text-to-Speech** — Listen to election content in 9 Indian languages via Google Cloud TTS API
+- 📊 **Analytics Export** — Event data exported to BigQuery for analysis
 - 📢 **Updates** — Latest ECI announcements and policy updates
 
 ---
@@ -67,20 +72,23 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 │  helmet · compression · express-rate-limit · CORS    │
 │  In-memory cache (~30s TTL) · HSTS in production     │
 │  trust proxy · static cache (1d prod) · full JSDoc   │
+│  Structured error handling · Request logging         │
 │                                                      │
-│  14 routes:                                          │
-│  /api/health  /api/config  /api/election  /api/steps │
-│  /api/quiz    /api/quiz/submit  /api/leaderboard     │
-│  /api/dates   /api/announcements  /api/parliament    │
-│  /api/states  /api/president  /api/chat              │
-│  /api/translate  /api/analyze                        │
-└──────┬──────────────────┬──────────────────┬────────┘
-       │                  │                  │
-┌──────▼──────┐  ┌────────▼──────┐  ┌───────▼──────┐
-│ Gemini API  │  │  Cloud NL API  │  │  Firestore   │
-│ chat +      │  │  entity +      │  │  quiz scores │
-│ translation │  │  sentiment     │  │  leaderboard │
-└─────────────┘  └───────────────┘  └──────────────┘
+│  19 routes:                                          │
+│  /api/health  /api/config  /api/services             │
+│  /api/election  /api/steps  /api/quiz                │
+│  /api/quiz/submit  /api/leaderboard  /api/dates      │
+│  /api/announcements  /api/parliament  /api/states    │
+│  /api/president  /api/chat  /api/translate           │
+│  /api/analyze  /api/text-to-speech                   │
+│  /api/vision/verify-voter-id  /api/analytics/export  │
+└──────┬───────────┬───────────┬───────────┬──────────┘
+       │           │           │           │
+┌──────▼──────┐ ┌──▼────────┐ ┌▼─────────┐ ┌▼─────────┐
+│ Gemini API  │ │ Cloud     │ │ Cloud    │ │Firestore │
+│ chat +      │ │Translation│ │ Vision   │ │  + BQ    │
+│ NL analysis │ │ + TTS     │ │ OCR      │ │ storage  │
+└─────────────┘ └───────────┘ └──────────┘ └──────────┘
 ```
 
 ---
@@ -89,9 +97,12 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 
 | Service | Integration | Usage |
 |---|---|---|
-| **Gemini Flash (latest)** | Server-side REST proxy | Bilingual election Q&A with full ECI knowledge context |
-| **Gemini (Translation)** | Server-side REST proxy | Translate election content to 8 Indian languages |
-| **Cloud Natural Language API** | Server-side REST (2 calls) | Entity extraction + sentiment analysis on election text |
+| **Gemini 2.0 Flash** | Server-side REST proxy | Bilingual election Q&A with full ECI knowledge context |
+| **Cloud Translation API** | Server-side REST | Primary translation to 10 Indian languages |
+| **Cloud Text-to-Speech API** | Server-side REST | Audio output in 9 Indian languages for accessibility |
+| **Cloud Vision API** | Server-side REST | OCR for Voter ID verification (EPIC extraction) |
+| **Cloud Natural Language API** | Server-side REST | Entity extraction + sentiment analysis on election text |
+| **BigQuery** | Server-side export | Analytics event data warehousing |
 | **Firebase Firestore** | Admin SDK (server) + client SDK | Quiz score persistence and leaderboard |
 | **Firebase Authentication** | Modular SDK (client) | Google Sign-In via `signInWithRedirect` |
 | **Google Analytics (GA4)** | Firebase Analytics modular SDK | Tab views, chat messages, quiz completions |
@@ -99,9 +110,8 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 | **Google Calendar** | Deep-link URLs | Add election dates to personal calendar |
 | **Google Cloud Run** | Deployment target | Serverless containerised Node.js hosting |
 | **Google Fonts** | CDN | Playfair Display + DM Sans + DM Mono |
-| **Google Identity Toolkit** | Firebase Auth | OAuth 2.0 Sign in with Google flow |
 
-**11 Google Services integrated.**
+**13 Google Services integrated** (9 distinct AI/ML + Cloud APIs).
 
 ---
 
@@ -109,12 +119,12 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 
 | Criterion | Evidence |
 |---|---|
-| **Code Quality** | `server.js` fully JSDoc-annotated with `@param`, `@returns`, `@typedef`. Clean route sections, helper extraction (`buildSystemPrompt`, `translateWithGemini`, `saveQuizScore`, `getTopScores`, `sentimentLabel`). No inline secrets. |
-| **Security** | `helmet` (CSP + HSTS in production), `cors` via `ALLOWED_ORIGIN`, per-route rate limits (20/min chat, 30/min quiz submit, 100/min data), `trust proxy`, 10kb JSON cap, server-only API keys, `escHtml` XSS protection, Firebase OAuth. |
+| **Code Quality** | `server.js` (1600+ lines) fully JSDoc-annotated. Structured error handling with `ERROR_CODES`, reusable validation helpers (`validateString`, `validateEnum`), request logging middleware, environment validation at startup. Clean route sections, helper extraction. No inline secrets. |
+| **Security** | `helmet` (CSP + HSTS in production), `cors` via `ALLOWED_ORIGIN`, per-route rate limits (20/min chat, 100/min data), `trust proxy`, 10mb JSON cap (for image uploads), server-only API keys, `escHtml` XSS protection, Firebase OAuth. |
 | **Efficiency** | In-memory API cache (30s TTL + X-Cache header), gzip compression, 1-day `Cache-Control` on static assets in production, lazy panel fetches, single bundle from `public/`. |
-| **Testing** | **99** Jest + Supertest API tests covering all 14 routes, cache behaviour, input validation, and security headers. **30** Playwright E2E tests (navigation, quiz, chat, accessibility). CI via `.github/workflows/ci.yml`. |
-| **Accessibility** | `role="tablist"` + `aria-controls` on every tab, skip link, `aria-live` for chat/quiz/translate/analyze, landmarks, single `h1`, WCAG 2.1 AA contrast, `prefers-reduced-motion` respected throughout. |
-| **Google Services** | **11 services** — see table above. Three distinct AI/ML workflows: Gemini chat, Gemini translation, Cloud Natural Language entity+sentiment. |
+| **Testing** | **162** Jest + Supertest API tests (~91% coverage) covering all 19 routes, Google Cloud services (mocked), cache behaviour, input validation, and security headers. **30** Playwright E2E tests (navigation, quiz, chat, accessibility). CI via `.github/workflows/ci.yml`. |
+| **Accessibility** | `role="tablist"` + `aria-controls` on every tab, skip link, `aria-live` for chat/quiz/translate/TTS, landmarks, single `h1`, WCAG 2.1 AA contrast, `prefers-reduced-motion` respected, Text-to-Speech for screen reader alternative. |
+| **Google Services** | **9 distinct Google Cloud services** — Cloud Translation, Text-to-Speech, Vision, Natural Language, Gemini, Firestore, Auth, Analytics, BigQuery. Six AI/ML workflows: chat, translation, TTS, OCR, entity extraction, sentiment. |
 
 ---
 
@@ -135,12 +145,12 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 
 ```
 VoteWiseIndia/
-├── server.js              # Express backend (1087 lines) — full JSDoc, 14 routes
-├── server.test.js         # Jest + Supertest — 99 API tests
+├── server.js              # Express backend (1600+ lines) — full JSDoc, 19 routes
+├── server.test.js         # Jest + Supertest — 162 API tests (~91% coverage)
 ├── public/
 │   ├── index.html         # SPA markup — semantic, accessible, ES module
 │   ├── styles.css         # Design system (1750+ lines)
-│   └── app.js             # Frontend logic (933 lines) — Firebase modular SDK
+│   └── app.js             # Frontend logic (1000+ lines) — Firebase modular SDK
 ├── e2e/
 │   ├── navigation.spec.js      # 8 tests
 │   ├── quiz.spec.js            # 6 tests
@@ -150,7 +160,7 @@ VoteWiseIndia/
 ├── Dockerfile             # Cloud Run — non-root user, healthcheck
 ├── .dockerignore
 ├── package.json
-├── .env.example
+├── .env.example           # Template with all Google Cloud API vars
 ├── .gitignore
 └── README.md
 ```
@@ -191,7 +201,12 @@ gcloud services enable \
   firestore.googleapis.com \
   identitytoolkit.googleapis.com \
   firebase.googleapis.com \
-  language.googleapis.com
+  language.googleapis.com \
+  translate.googleapis.com \
+  texttospeech.googleapis.com \
+  vision.googleapis.com \
+  bigquery.googleapis.com \
+  generativelanguage.googleapis.com
 
 # Deploy
 gcloud run deploy votewise-india \
@@ -199,7 +214,7 @@ gcloud run deploy votewise-india \
   --region asia-south1 \
   --platform managed \
   --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=YOUR_KEY,FIREBASE_API_KEY=YOUR_KEY,...
+  --set-env-vars GEMINI_API_KEY=YOUR_KEY,GOOGLE_CLOUD_API_KEY=YOUR_KEY,FIREBASE_API_KEY=YOUR_KEY,...
 ```
 
 ---
@@ -208,16 +223,20 @@ gcloud run deploy votewise-india \
 
 | Variable | Required | Description |
 |---|---|---|
-| `GEMINI_API_KEY` | Yes | Gemini API key (also used for Natural Language API) |
+| `GEMINI_API_KEY` | Yes | Gemini API key (for AI chat + Natural Language API) |
+| `GOOGLE_CLOUD_API_KEY` | Yes | Google Cloud API key (for Translation, TTS, Vision APIs) |
 | `FIREBASE_API_KEY` | Yes | Firebase web app API key |
 | `FIREBASE_AUTH_DOMAIN` | Yes | e.g. `your-project.firebaseapp.com` |
-| `FIREBASE_PROJECT_ID` | Yes | GCP project ID |
+| `FIREBASE_PROJECT_ID` | Yes | GCP project ID (also used for BigQuery) |
 | `FIREBASE_STORAGE_BUCKET` | Yes | e.g. `your-project.firebasestorage.app` |
 | `FIREBASE_MESSAGING_SENDER_ID` | Yes | Firebase sender ID |
 | `FIREBASE_APP_ID` | Yes | Firebase web app ID |
 | `FIREBASE_MEASUREMENT_ID` | Optional | GA4 measurement ID |
+| `BIGQUERY_DATASET` | Optional | BigQuery dataset name (default: `votewise_analytics`) |
 | `PORT` | Optional | Server port (default 8080, set automatically by Cloud Run) |
 | `ALLOWED_ORIGIN` | Optional | CORS origin lock for production |
+
+> **Note:** `GEMINI_API_KEY` and `GOOGLE_CLOUD_API_KEY` can be the same key if all APIs are enabled on the same GCP project.
 
 ---
 
@@ -226,9 +245,10 @@ gcloud run deploy votewise-india \
 1. Election data reflects state as of early 2026. Production would sync with ECI's live API/RSS.
 2. The app is politically neutral — educates about the *process*, never parties or candidates.
 3. Quiz scores use anonymous client session IDs — no PII is stored.
-4. Translation uses Gemini rather than Cloud Translation API to preserve election domain context.
-5. Natural Language API uses the same API key as Gemini (both enabled under the same GCP project).
-6. Firebase is optional — app degrades gracefully if Firebase env vars are unset.
+4. Translation uses Cloud Translation API as primary (with Gemini fallback for domain-specific context).
+5. All Google Cloud APIs are enabled under the same GCP project and use the same API key.
+6. Firebase and Google Cloud services are optional — app degrades gracefully with demo responses if env vars are unset.
+7. Vision API Voter ID verification is for demonstration; production would add validation and privacy controls.
 
 ---
 
@@ -236,12 +256,13 @@ gcloud run deploy votewise-india \
 
 - ✅ Skip-to-content link
 - ✅ `aria-label` on all interactive elements
-- ✅ `aria-live` regions for chat, quiz, translation, and NL analysis output
+- ✅ `aria-live` regions for chat, quiz, translation, TTS, and analysis output
 - ✅ Semantic HTML (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`)
 - ✅ WCAG 2.1 AA contrast ratios
 - ✅ Full keyboard navigation
 - ✅ `prefers-reduced-motion: reduce` honoured
-- ✅ Bilingual (EN / HI) interface + 8-language Gemini translation
+- ✅ Bilingual (EN / HI) interface + 10-language Cloud Translation
+- ✅ **Text-to-Speech** for 9 Indian languages (Cloud TTS API)
 - ✅ Mobile-responsive, tested to 360px width
 
 ---

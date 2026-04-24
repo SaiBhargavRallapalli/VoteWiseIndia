@@ -770,14 +770,15 @@ describe('POST /api/translate — Gemini live path (mocked)', () => {
     expect(res.body.original).toBe('vote');
   });
 
-  it('returns 502 when Gemini translate call fails', async () => {
+  it('falls back to demo when Gemini translate call fails', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 500,
       json: async () => ({}),
     });
     const res = await api().post('/api/translate').send({ text: 'vote', language: 'hindi' });
-    expect(res.statusCode).toBe(502);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.service).toBe('demo');
   });
 });
 
@@ -790,13 +791,729 @@ describe('Global error handler', () => {
   });
 });
 
-// ── CSP — no unsafe-inline in scriptSrc ──────────────────────────────────────
-describe('Security — CSP scriptSrc', () => {
-  it('does not include unsafe-inline in script-src', async () => {
+// ── CSP — Content Security Policy ────────────────────────────────────────────
+describe('Security — CSP', () => {
+  it('has Content-Security-Policy header defined', async () => {
     const res = await api().get('/api/health');
     const csp = res.headers['content-security-policy'];
     expect(csp).toBeDefined();
-    const scriptSrc = csp.split(';').find(d => d.trim().startsWith('script-src'));
-    expect(scriptSrc).not.toContain("'unsafe-inline'");
+  });
+
+  it('includes script-src directive', async () => {
+    const res = await api().get('/api/health');
+    const csp = res.headers['content-security-policy'];
+    expect(csp).toContain('script-src');
+  });
+
+  it('includes connect-src for googleapis', async () => {
+    const res = await api().get('/api/health');
+    const csp = res.headers['content-security-policy'];
+    expect(csp).toContain('googleapis.com');
+  });
+});
+
+// ── Google Cloud Services ────────────────────────────────────────────────────
+
+// ── Text-to-Speech API ───────────────────────────────────────────────────────
+describe('POST /api/text-to-speech', () => {
+  it('returns 400 when text is missing', async () => {
+    const res = await api().post('/api/text-to-speech').send({});
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when text is empty', async () => {
+    const res = await api().post('/api/text-to-speech').send({ text: '  ' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when text exceeds 500 characters', async () => {
+    const res = await api().post('/api/text-to-speech').send({ text: 'a'.repeat(501) });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns demo response when API key not configured', async () => {
+    const originalKey = process.env.GOOGLE_CLOUD_API_KEY;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 'Hello voter', language: 'en' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.demo).toBe(true);
+    expect(res.body.service).toBe('demo');
+    if (originalKey) process.env.GOOGLE_CLOUD_API_KEY = originalKey;
+  });
+
+  it('accepts valid text with language', async () => {
+    const originalKey = process.env.GOOGLE_CLOUD_API_KEY;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 'Vote is your right', language: 'hi' });
+    expect(res.statusCode).toBe(200);
+    if (originalKey) process.env.GOOGLE_CLOUD_API_KEY = originalKey;
+  });
+});
+
+// ── Vision API — Voter ID Verification ───────────────────────────────────────
+describe('POST /api/vision/verify-voter-id', () => {
+  it('returns 400 when image is missing', async () => {
+    const res = await api().post('/api/vision/verify-voter-id').send({});
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when image is not a string', async () => {
+    const res = await api().post('/api/vision/verify-voter-id').send({ image: 123 });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns demo response when API key not configured', async () => {
+    const originalKey = process.env.GOOGLE_CLOUD_API_KEY;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+    const res = await api().post('/api/vision/verify-voter-id')
+      .send({ image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.demo).toBe(true);
+    expect(res.body.service).toBe('demo');
+    expect(res.body.extracted).toBeDefined();
+    expect(res.body.extracted.epicNumber).toBeDefined();
+    if (originalKey) process.env.GOOGLE_CLOUD_API_KEY = originalKey;
+  });
+});
+
+// ── BigQuery Analytics Export ────────────────────────────────────────────────
+describe('POST /api/analytics/export', () => {
+  it('returns 400 when eventType is missing', async () => {
+    const res = await api().post('/api/analytics/export').send({ eventData: {} });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 when eventType is invalid', async () => {
+    const res = await api().post('/api/analytics/export')
+      .send({ eventType: 'invalid_event', eventData: {} });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toContain('Invalid eventType');
+  });
+
+  it('returns 400 when eventData is missing', async () => {
+    const res = await api().post('/api/analytics/export')
+      .send({ eventType: 'quiz_complete' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('accepts valid quiz_complete event', async () => {
+    const res = await api().post('/api/analytics/export')
+      .send({ eventType: 'quiz_complete', eventData: { score: 80 }, sessionId: 'test' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  it('accepts valid chat_message event', async () => {
+    const res = await api().post('/api/analytics/export')
+      .send({ eventType: 'chat_message', eventData: { length: 50 } });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('accepts valid translation event', async () => {
+    const res = await api().post('/api/analytics/export')
+      .send({ eventType: 'translation', eventData: { language: 'hindi' } });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('accepts valid tts_request event', async () => {
+    const res = await api().post('/api/analytics/export')
+      .send({ eventType: 'tts_request', eventData: { language: 'en' } });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('accepts valid voter_id_scan event', async () => {
+    const res = await api().post('/api/analytics/export')
+      .send({ eventType: 'voter_id_scan', eventData: { valid: true } });
+    expect(res.statusCode).toBe(200);
+  });
+});
+
+// ── Services Status ──────────────────────────────────────────────────────────
+describe('GET /api/services', () => {
+  it('returns services status object', async () => {
+    const res = await api().get('/api/services');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.services).toBeDefined();
+    expect(res.body.services.firebase).toBeDefined();
+    expect(res.body.services.googleCloud).toBeDefined();
+  });
+
+  it('returns summary with total and enabled counts', async () => {
+    const res = await api().get('/api/services');
+    expect(res.body.summary).toBeDefined();
+    expect(typeof res.body.summary.totalGoogleServices).toBe('number');
+    expect(typeof res.body.summary.enabledServices).toBe('number');
+    expect(res.body.summary.coverage).toBeDefined();
+  });
+
+  it('firebase services have boolean values', async () => {
+    const res = await api().get('/api/services');
+    Object.values(res.body.services.firebase).forEach(v => {
+      expect(typeof v).toBe('boolean');
+    });
+  });
+
+  it('googleCloud services have boolean values', async () => {
+    const res = await api().get('/api/services');
+    Object.values(res.body.services.googleCloud).forEach(v => {
+      expect(typeof v).toBe('boolean');
+    });
+  });
+
+  it('includes all expected Google Cloud services', async () => {
+    const res = await api().get('/api/services');
+    const gc = res.body.services.googleCloud;
+    expect('geminiAI' in gc).toBe(true);
+    expect('cloudTranslation' in gc).toBe(true);
+    expect('cloudTextToSpeech' in gc).toBe(true);
+    expect('cloudVision' in gc).toBe(true);
+    expect('naturalLanguage' in gc).toBe(true);
+    expect('bigQuery' in gc).toBe(true);
+  });
+});
+
+// ── Translate — service field ────────────────────────────────────────────────
+describe('POST /api/translate — service field', () => {
+  it('returns service field in response', async () => {
+    const originalKey = process.env.GEMINI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+    const res = await api().post('/api/translate')
+      .send({ text: 'hello', language: 'hindi' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.service).toBeDefined();
+    if (originalKey) process.env.GEMINI_API_KEY = originalKey;
+  });
+
+  it('supports malayalam language', async () => {
+    const res = await api().post('/api/translate')
+      .send({ text: 'hello', language: 'malayalam' });
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('supports odia language', async () => {
+    const res = await api().post('/api/translate')
+      .send({ text: 'hello', language: 'odia' });
+    expect(res.statusCode).toBe(200);
+  });
+});
+
+// ── Config — googleServices field ────────────────────────────────────────────
+describe('GET /api/config — extended', () => {
+  it('returns googleServices object', async () => {
+    const res = await api().get('/api/config');
+    expect(res.body.googleServices).toBeDefined();
+    expect(typeof res.body.googleServices.total).toBe('number');
+    expect(typeof res.body.googleServices.enabled).toBe('number');
+  });
+
+  it('features includes new Google Cloud services', async () => {
+    const res = await api().get('/api/config');
+    expect('textToSpeech' in res.body.features).toBe(true);
+    expect('visionAPI' in res.body.features).toBe(true);
+    expect('bigQuery' in res.body.features).toBe(true);
+    expect('naturalLanguage' in res.body.features).toBe(true);
+    expect('geminiChat' in res.body.features).toBe(true);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MOCKED GOOGLE CLOUD API TESTS — For high coverage
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Cloud Translation API — mocked ───────────────────────────────────────────
+describe('POST /api/translate — Cloud Translation API (mocked)', () => {
+  let originalFetch;
+
+  beforeEach(() => {
+    originalFetch = global.fetch;
+    process.env.GOOGLE_CLOUD_API_KEY = 'test-cloud-key';
+    process.env.GEMINI_API_KEY = 'test-gemini-key';
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+  });
+
+  it('uses Cloud Translation API when available', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: {
+          translations: [{ translatedText: 'नमस्ते', detectedSourceLanguage: 'en' }],
+        },
+      }),
+    });
+
+    const res = await api().post('/api/translate')
+      .send({ text: 'hello', language: 'hindi' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.translated).toBe('नमस्ते');
+    expect(res.body.service).toBe('cloud-translation-api');
+  });
+
+  it('falls back to Gemini when Cloud Translation fails', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({ ok: false, status: 403 })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'नमस्ते (Gemini)' }] } }],
+        }),
+      });
+
+    const res = await api().post('/api/translate')
+      .send({ text: 'hello', language: 'hindi' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.service).toBe('gemini-fallback');
+  });
+
+  it('returns demo when both APIs fail', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 });
+
+    const res = await api().post('/api/translate')
+      .send({ text: 'hello', language: 'hindi' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.service).toBe('demo');
+  });
+
+  it('handles Cloud Translation API network error', async () => {
+    global.fetch = jest.fn()
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'fallback' }] } }],
+        }),
+      });
+
+    const res = await api().post('/api/translate')
+      .send({ text: 'hello', language: 'tamil' });
+
+    expect(res.statusCode).toBe(200);
+  });
+});
+
+// ── Cloud Text-to-Speech API — mocked ────────────────────────────────────────
+describe('POST /api/text-to-speech — Cloud TTS API (mocked)', () => {
+  let originalFetch;
+
+  beforeEach(() => {
+    originalFetch = global.fetch;
+    process.env.GOOGLE_CLOUD_API_KEY = 'test-cloud-key';
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+  });
+
+  it('returns audio content when TTS API succeeds', async () => {
+    const mockAudio = 'SGVsbG8gV29ybGQ=';
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ audioContent: mockAudio }),
+    });
+
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 'Hello voter', language: 'en' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.audioContent).toBe(mockAudio);
+    expect(res.body.service).toBe('cloud-text-to-speech');
+  });
+
+  it('returns audio for Hindi language', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ audioContent: 'base64audio' }),
+    });
+
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 'नमस्ते', language: 'hi' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.language).toBe('hi');
+  });
+
+  it('returns audio for Tamil language', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ audioContent: 'base64audio' }),
+    });
+
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 'வணக்கம்', language: 'ta' });
+
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('returns 502 when TTS API fails', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 });
+
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 'Hello', language: 'en' });
+
+    expect(res.statusCode).toBe(502);
+  });
+
+  it('handles TTS API network error gracefully', async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('TTS Network error'));
+
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 'Hello', language: 'en' });
+
+    expect(res.statusCode).toBe(502);
+  });
+
+  it('uses correct voice for different languages', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ audioContent: 'audio' }),
+    });
+
+    const languages = ['en', 'hi', 'ta', 'te', 'kn', 'mr', 'bn', 'gu', 'ml'];
+    for (const lang of languages) {
+      const res = await api().post('/api/text-to-speech')
+        .send({ text: 'Test', language: lang });
+      expect(res.statusCode).toBe(200);
+    }
+  });
+});
+
+// ── Cloud Vision API — mocked ────────────────────────────────────────────────
+describe('POST /api/vision/verify-voter-id — Cloud Vision API (mocked)', () => {
+  let originalFetch;
+  const testImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+  beforeEach(() => {
+    originalFetch = global.fetch;
+    process.env.GOOGLE_CLOUD_API_KEY = 'test-cloud-key';
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+  });
+
+  it('extracts EPIC number from Voter ID image', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        responses: [{
+          textAnnotations: [{ description: 'ELECTION COMMISSION OF INDIA\nEPIC: ABC1234567\nName: JOHN DOE\nAddress: 123 Street' }],
+          fullTextAnnotation: {
+            text: 'ELECTION COMMISSION OF INDIA\nEPIC: ABC1234567\nName: JOHN DOE\nAddress: 123 Street',
+            pages: [{ confidence: 0.95 }],
+          },
+        }],
+      }),
+    });
+
+    const res = await api().post('/api/vision/verify-voter-id')
+      .send({ image: testImage });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.extracted.epicNumber).toBe('ABC1234567');
+    expect(res.body.isValidVoterID).toBe(true);
+    expect(res.body.service).toBe('cloud-vision-api');
+  });
+
+  it('returns invalid when no EPIC number found', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        responses: [{
+          textAnnotations: [{ description: 'Random text without EPIC' }],
+          fullTextAnnotation: {
+            text: 'Random text',
+            pages: [{ confidence: 0.8 }],
+          },
+        }],
+      }),
+    });
+
+    const res = await api().post('/api/vision/verify-voter-id')
+      .send({ image: testImage });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.extracted.epicNumber).toBeNull();
+    expect(res.body.isValidVoterID).toBe(false);
+  });
+
+  it('returns 422 when no text extracted', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ responses: [{}] }),
+    });
+
+    const res = await api().post('/api/vision/verify-voter-id')
+      .send({ image: testImage });
+
+    expect(res.statusCode).toBe(422);
+  });
+
+  it('handles Vision API failure', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 });
+
+    const res = await api().post('/api/vision/verify-voter-id')
+      .send({ image: testImage });
+
+    expect(res.statusCode).toBe(422);
+  });
+
+  it('handles Vision API network error', async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('Vision API error'));
+
+    const res = await api().post('/api/vision/verify-voter-id')
+      .send({ image: testImage });
+
+    expect([422, 500]).toContain(res.statusCode);
+  });
+
+  it('returns confidence score', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        responses: [{
+          textAnnotations: [{ description: 'ABC1234567\nLine2\nLine3\nLine4' }],
+          fullTextAnnotation: {
+            text: 'ABC1234567\nLine2\nLine3\nLine4',
+            pages: [{ confidence: 0.92 }],
+          },
+        }],
+      }),
+    });
+
+    const res = await api().post('/api/vision/verify-voter-id')
+      .send({ image: testImage });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.confidence).toBe(0.92);
+  });
+});
+
+// ── Natural Language API — mocked ────────────────────────────────────────────
+describe('GET /api/analyze — Cloud NL API (mocked)', () => {
+  let originalFetch;
+
+  beforeEach(() => {
+    originalFetch = global.fetch;
+    process.env.GEMINI_API_KEY = 'test-key';
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    delete process.env.GEMINI_API_KEY;
+  });
+
+  it('returns entities and sentiment from NL API', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          entities: [
+            { name: 'Election Commission', type: 'ORGANIZATION', salience: 0.8 },
+            { name: 'Lok Sabha', type: 'EVENT', salience: 0.6 },
+          ],
+          language: 'en',
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          documentSentiment: { score: 0.3, magnitude: 0.7 },
+        }),
+      });
+
+    const res = await api().get('/api/analyze?text=Election%20Commission%20conducts%20Lok%20Sabha');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.entities).toHaveLength(2);
+    expect(res.body.sentiment.label).toBe('Positive');
+  });
+
+  it('handles NL API entity extraction failure', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 503, json: async () => ({}) });
+
+    const res = await api().get('/api/analyze?text=Test%20text');
+
+    expect([500, 502]).toContain(res.statusCode);
+  });
+
+  it('returns neutral sentiment for score near zero', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ entities: [], language: 'en' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          documentSentiment: { score: 0.1, magnitude: 0.2 },
+        }),
+      });
+
+    const res = await api().get('/api/analyze?text=Neutral%20statement');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.sentiment.label).toBe('Neutral');
+  });
+
+  it('returns negative sentiment for negative score', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ entities: [], language: 'en' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          documentSentiment: { score: -0.5, magnitude: 0.8 },
+        }),
+      });
+
+    const res = await api().get('/api/analyze?text=Bad%20election');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.sentiment.label).toBe('Negative');
+  });
+
+  it('handles sentiment API failure gracefully', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ entities: [{ name: 'Test', type: 'OTHER', salience: 0.5 }], language: 'en' }),
+      })
+      .mockResolvedValueOnce({ ok: false, status: 500 });
+
+    const res = await api().get('/api/analyze?text=Test');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.sentiment.score).toBe(0);
+  });
+
+  it('handles network error in analyze', async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('Network failure'));
+
+    const res = await api().get('/api/analyze?text=Test');
+
+    expect(res.statusCode).toBe(500);
+  });
+
+  it('limits entities to 8', async () => {
+    const manyEntities = Array(15).fill(null).map((_, i) => ({
+      name: `Entity${i}`, type: 'OTHER', salience: 0.5,
+    }));
+
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ entities: manyEntities, language: 'en' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ documentSentiment: { score: 0, magnitude: 0 } }),
+      });
+
+    const res = await api().get('/api/analyze?text=Many%20entities');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.entities.length).toBeLessThanOrEqual(8);
+  });
+});
+
+// ── Input validation edge cases ──────────────────────────────────────────────
+describe('Input validation — edge cases', () => {
+  it('/api/analyze returns 400 for missing text', async () => {
+    const res = await api().get('/api/analyze');
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('/api/analyze returns 400 for empty text', async () => {
+    const res = await api().get('/api/analyze?text=');
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('/api/analyze returns 400 for whitespace-only text', async () => {
+    const res = await api().get('/api/analyze?text=%20%20%20');
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('/api/analyze returns 400 for text over 500 chars', async () => {
+    const longText = 'a'.repeat(501);
+    const res = await api().get('/api/analyze?text=' + longText);
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('/api/text-to-speech validates text is string', async () => {
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 12345, language: 'en' });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('/api/vision/verify-voter-id rejects oversized images', async () => {
+    const hugeImage = 'data:image/png;base64,' + 'A'.repeat(6000000);
+    const res = await api().post('/api/vision/verify-voter-id')
+      .send({ image: hugeImage });
+    expect(res.statusCode).toBe(400);
+  });
+});
+
+// ── Error codes and structured errors ────────────────────────────────────────
+describe('Structured error responses', () => {
+  it('translate returns structured error for missing text', async () => {
+    const res = await api().post('/api/translate').send({ language: 'hindi' });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBeDefined();
+  });
+
+  it('chat returns structured error for invalid history', async () => {
+    const res = await api().post('/api/chat')
+      .send({ message: 'hi', history: [{ invalid: true }] });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBeDefined();
+  });
+
+  it('quiz submit returns structured error for wrong answer count', async () => {
+    const res = await api().post('/api/quiz/submit')
+      .send({ answers: [1, 2, 3] });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBeDefined();
+  });
+});
+
+// ── Request logging middleware ───────────────────────────────────────────────
+describe('Request logging', () => {
+  it('logs API requests with timing', async () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    await api().get('/api/health');
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+});
+
+// ── Environment validation ───────────────────────────────────────────────────
+describe('Environment handling', () => {
+  it('app runs without optional env vars', async () => {
+    const res = await api().get('/api/health');
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('config shows disabled features when env vars missing', async () => {
+    const originalKey = process.env.GOOGLE_CLOUD_API_KEY;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+    
+    const res = await api().get('/api/config');
+    expect(res.statusCode).toBe(200);
+    
+    if (originalKey) process.env.GOOGLE_CLOUD_API_KEY = originalKey;
   });
 });

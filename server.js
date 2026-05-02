@@ -52,7 +52,7 @@ app.use(helmet({
       styleSrc:   ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc:    ["'self'", 'https://fonts.gstatic.com'],
       frameSrc:   ['https://www.google.com', 'https://accounts.google.com',
-                   'https://promptwars-493418.firebaseapp.com'],
+                   ...(process.env.FIREBASE_AUTH_DOMAIN ? [`https://${process.env.FIREBASE_AUTH_DOMAIN}`] : [])],
       connectSrc: ["'self'",
                    'https://*.googleapis.com',
                    'https://www.gstatic.com',

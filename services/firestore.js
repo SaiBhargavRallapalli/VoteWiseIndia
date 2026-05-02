@@ -7,7 +7,7 @@ let db = null;
 try {
   admin.initializeApp();
   db = admin.firestore();
-  console.log('Firebase Firestore: connected');
+  console.info('Firebase Firestore: connected');
 } catch (e) {
   console.warn('Firebase Firestore: running without persistence —', e.message);
 }

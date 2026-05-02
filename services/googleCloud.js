@@ -205,7 +205,7 @@ async function exportToBigQuery(eventType, eventData) {
     session_id: eventData.sessionId || 'anonymous',
   };
 
-  console.log(`[BigQuery] Export to ${projectId}.${dataset}: ${eventType}`, row);
+  console.info(`[BigQuery] Export to ${projectId}.${dataset}: ${eventType}`);
   return { success: true, service: 'bigquery', table: `${dataset}.events`, row };
 }
 

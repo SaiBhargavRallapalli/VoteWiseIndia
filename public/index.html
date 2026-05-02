@@ -474,7 +474,7 @@
             <div class="evm-control-bar">
               <div class="evm-ctrl-led" id="evm-ctrl-led" aria-hidden="true"></div>
               <div class="evm-ctrl-status" id="evm-ctrl-status">Ready — Booth Officer must enable voting</div>
-              <button class="evm-ballot-btn" id="evm-ballot-btn" onclick="evmEnableVoting()" aria-label="Enable voting on EVM">
+              <button class="evm-ballot-btn" id="evm-ballot-btn" aria-label="Enable voting on EVM">
                 ▶ BALLOT
               </button>
             </div>
@@ -527,7 +527,7 @@
           <div id="evm-result-card" class="sidebar-card evm-result-card" style="display:none">
             <div class="sidebar-title">✅ Vote Cast!</div>
             <div id="evm-result-text" style="font-size:0.82rem;color:var(--text-2);line-height:1.7;"></div>
-            <button class="btn btn-primary" style="margin-top:0.8rem;width:100%;" onclick="evmReset()" aria-label="Reset EVM to vote again">🔄 Try Again</button>
+            <button id="evm-try-again-btn" class="btn btn-primary" style="margin-top:0.8rem;width:100%;" aria-label="Reset EVM to vote again">🔄 Try Again</button>
           </div>
         </div>
       </div>

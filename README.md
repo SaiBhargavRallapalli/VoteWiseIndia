@@ -5,8 +5,8 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org)
 [![Google Gemini](https://img.shields.io/badge/Google-Gemini_API-blue)](https://ai.google.dev)
 [![Cloud Run](https://img.shields.io/badge/Google-Cloud_Run-blue)](https://cloud.google.com/run)
-[![Tests](https://img.shields.io/badge/Jest-162_tests-brightgreen)](./server.test.js)
-[![Coverage](https://img.shields.io/badge/coverage-91%25-brightgreen)](./server.test.js)
+[![Tests](https://img.shields.io/badge/Jest-175_tests-brightgreen)](./server.test.js)
+[![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen)](./server.test.js)
 [![E2E](https://img.shields.io/badge/Playwright-30_passing-blue)](./e2e)
 [![Google Services](https://img.shields.io/badge/Google_Services-13_integrated-blue)](./README.md)
 [![PromptWars](https://img.shields.io/badge/PromptWars-Virtual_2026-orange)](https://promptwars.in)
@@ -51,6 +51,8 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 - 🇮🇳 **President & VP** — Election process, powers, eligibility
 - 🌐 **Translate** — Any election text → 10 Indian languages via Google Cloud Translation API (Gemini fallback)
 - 🔊 **Text-to-Speech** — Listen to election content in 9 Indian languages via Google Cloud TTS API
+- ⚡ **EVM Simulator** — Interactive step-by-step Electronic Voting Machine demo with VVPAT slip animation and beep audio
+- ✅ **Voter Checklist** — 12-task readiness checklist with progress tracker and Citizen Voter badge
 - 📊 **Analytics Export** — Event data exported to BigQuery for analysis
 - 📢 **Updates** — Latest ECI announcements and policy updates
 
@@ -74,14 +76,16 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 │  trust proxy · static cache (1d prod) · full JSDoc   │
 │  Structured error handling · Request logging         │
 │                                                      │
-│  19 routes:                                          │
+│  Modular: data/ · services/ · middleware/ · routes/  │
+│  21 routes:                                          │
 │  /api/health  /api/config  /api/services             │
 │  /api/election  /api/steps  /api/quiz                │
 │  /api/quiz/submit  /api/leaderboard  /api/dates      │
 │  /api/announcements  /api/parliament  /api/states    │
 │  /api/president  /api/chat  /api/translate           │
-│  /api/analyze  /api/text-to-speech                   │
-│  /api/vision/verify-voter-id  /api/analytics/export  │
+│  /api/analyze  /api/text-to-speech  /api/checklist   │
+│  /api/evm/candidates  /api/vision/verify-voter-id    │
+│  /api/analytics/export                               │
 └──────┬───────────┬───────────┬───────────┬──────────┘
        │           │           │           │
 ┌──────▼──────┐ ┌──▼────────┐ ┌▼─────────┐ ┌▼─────────┐
@@ -119,10 +123,10 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 
 | Criterion | Evidence |
 |---|---|
-| **Code Quality** | `server.js` (1600+ lines) fully JSDoc-annotated. Structured error handling with `ERROR_CODES`, reusable validation helpers (`validateString`, `validateEnum`), request logging middleware, environment validation at startup. Clean route sections, helper extraction. No inline secrets. |
+| **Code Quality** | Modular architecture: `server.js` (105 lines thin entry point) + `data/` + `services/` + `middleware/` + `routes/` (12 focused modules). Full JSDoc, request logging, environment validation, no dead code, no inline secrets, `'unsafe-inline'` removed from CSP. |
 | **Security** | `helmet` (CSP + HSTS in production), `cors` via `ALLOWED_ORIGIN`, per-route rate limits (20/min chat, 100/min data), `trust proxy`, 10mb JSON cap (for image uploads), server-only API keys, `escHtml` XSS protection, Firebase OAuth. |
 | **Efficiency** | In-memory API cache (30s TTL + X-Cache header), gzip compression, 1-day `Cache-Control` on static assets in production, lazy panel fetches, single bundle from `public/`. |
-| **Testing** | **162** Jest + Supertest API tests (~91% coverage) covering all 19 routes, Google Cloud services (mocked), cache behaviour, input validation, and security headers. **30** Playwright E2E tests (navigation, quiz, chat, accessibility). CI via `.github/workflows/ci.yml`. |
+| **Testing** | **175** Jest + Supertest API tests (~93.7% coverage) covering all 21 routes, Google Cloud services (mocked), cache behaviour, input validation, and security headers. **30** Playwright E2E tests (navigation, quiz, chat, accessibility). CI via `.github/workflows/ci.yml`. |
 | **Accessibility** | `role="tablist"` + `aria-controls` on every tab, skip link, `aria-live` for chat/quiz/translate/TTS, landmarks, single `h1`, WCAG 2.1 AA contrast, `prefers-reduced-motion` respected, Text-to-Speech for screen reader alternative. |
 | **Google Services** | **9 distinct Google Cloud services** — Cloud Translation, Text-to-Speech, Vision, Natural Language, Gemini, Firestore, Auth, Analytics, BigQuery. Six AI/ML workflows: chat, translation, TTS, OCR, entity extraction, sentiment. |
 
@@ -145,12 +149,30 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 
 ```
 VoteWiseIndia/
-├── server.js              # Express backend (1600+ lines) — full JSDoc, 19 routes
-├── server.test.js         # Jest + Supertest — 162 API tests (~91% coverage)
+├── server.js              # Thin entry point (105 lines) — mounts all routes
+├── server.test.js         # Jest + Supertest — 175 API tests (~93.7% coverage)
+├── data/
+│   └── electionData.js    # All static Indian electoral data (ELECTION_DATA, STATES, etc.)
+├── middleware/
+│   ├── index.js           # requestLogger, validateEnvironment
+│   └── rateLimiters.js    # chatLimiter (20/min), apiLimiter (100/min)
+├── routes/
+│   ├── config.js          # /api/health  /api/config  /api/services
+│   ├── election.js        # /api/election  /api/steps  /api/quiz  /api/leaderboard
+│   │                      # /api/checklist  /api/evm/candidates
+│   ├── contentData.js     # /api/dates  /api/announcements  /api/analyze
+│   │                      # /api/states  /api/parliament  /api/president
+│   └── ai.js              # /api/chat  /api/translate  /api/text-to-speech
+│                          # /api/vision/verify-voter-id  /api/analytics/export
+├── services/
+│   ├── cache.js           # In-memory TTL cache (30s)
+│   ├── firestore.js       # Firestore quiz scores
+│   ├── gemini.js          # buildSystemPrompt with election context
+│   └── googleCloud.js     # Cloud Translation, TTS, Vision, BigQuery
 ├── public/
-│   ├── index.html         # SPA markup — semantic, accessible, ES module
+│   ├── index.html         # SPA markup — semantic, accessible, no inline handlers
 │   ├── styles.css         # Design system (1750+ lines)
-│   └── app.js             # Frontend logic (1000+ lines) — Firebase modular SDK
+│   └── app.js             # Frontend logic — Firebase modular SDK
 ├── e2e/
 │   ├── navigation.spec.js      # 8 tests
 │   ├── quiz.spec.js            # 6 tests
@@ -178,7 +200,7 @@ cp .env.example .env
 npm start
 # → http://localhost:8080
 
-# API tests (99 tests)
+# API tests (175 tests)
 npm test
 
 # E2E browser tests (install browsers once)

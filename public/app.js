@@ -1118,6 +1118,16 @@ async function initEVM() {
     evmCandidates = data.candidates;
     evmLoaded = true;
     renderEVMCandidates();
+
+    // Wire static EVM buttons
+    document.getElementById('evm-ballot-btn')?.addEventListener('click', evmEnableVoting);
+    document.getElementById('evm-try-again-btn')?.addEventListener('click', evmReset);
+
+    // Event delegation for dynamically rendered candidate vote buttons
+    document.getElementById('evm-candidates-list')?.addEventListener('click', e => {
+      const btn = e.target.closest('button.evm-vote-btn[data-cand-id]');
+      if (btn) evmCastVote(parseInt(btn.dataset.candId, 10));
+    });
   } catch (e) {
     document.getElementById('evm-candidates-list').innerHTML = '<div class="error-state">Failed to load EVM candidates.</div>';
   }
@@ -1135,7 +1145,7 @@ function renderEVMCandidates() {
         <div class="evm-cand-party">${escHtml(c.party)}</div>
       </div>
       <button class="evm-vote-btn" id="evm-btn-${c.id}"
-        onclick="evmCastVote(${c.id})"
+        data-cand-id="${c.id}"
         aria-label="Vote for ${escHtml(c.name)} of ${escHtml(c.party)}"
         disabled>
         ▮ VOTE

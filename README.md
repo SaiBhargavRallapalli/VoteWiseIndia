@@ -60,6 +60,8 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 
 ## Architecture
 
+![VoteWise India Architecture](./Architecture.png)
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │            Browser (Single-Page App)                 │

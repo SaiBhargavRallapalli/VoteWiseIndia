@@ -1,7 +1,7 @@
 'use strict';
 
 const express        = require('express');
-const { ELECTION_DATA }                 = require('../data/electionData');
+const { ELECTION_DATA, CHECKLIST_ITEMS, EVM_CANDIDATES } = require('../data/electionData');
 const { getCached, setCache }           = require('../services/cache');
 const { saveQuizScore, getTopScores }   = require('../services/firestore');
 const { apiLimiter }                    = require('../middleware/rateLimiters');
@@ -75,6 +75,26 @@ router.get('/leaderboard', apiLimiter, async (_req, res) => {
   const payload = { scores };
   setCache('leaderboard', payload);
   res.set('X-Cache', 'MISS').json(payload);
+});
+
+/** @route GET /api/checklist */
+router.get('/checklist', apiLimiter, (_req, res) => {
+  const cached = getCached('checklist');
+  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached);
+
+  const payload = { items: CHECKLIST_ITEMS, total: CHECKLIST_ITEMS.length };
+  setCache('checklist', payload);
+  res.set('X-Cache', 'MISS').set('Cache-Control', 'public, max-age=3600').json(payload);
+});
+
+/** @route GET /api/evm/candidates */
+router.get('/evm/candidates', apiLimiter, (_req, res) => {
+  const cached = getCached('evm-candidates');
+  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached);
+
+  const payload = { candidates: EVM_CANDIDATES, total: EVM_CANDIDATES.length };
+  setCache('evm-candidates', payload);
+  res.set('X-Cache', 'MISS').set('Cache-Control', 'public, max-age=3600').json(payload);
 });
 
 module.exports = router;

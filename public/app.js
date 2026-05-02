@@ -52,6 +52,8 @@ navBtns.forEach(btn => {
     if (target === 'updates' && !annLoaded) loadAnnouncements();
     if (target === 'how-to-vote' && !stepsLoaded) loadSteps();
     if (target === 'register' && !stepsLoaded) loadSteps();
+    if (target === 'evm' && !evmLoaded) initEVM();
+    if (target === 'checklist' && !checklistLoaded) initChecklist();
 
     // GA4 event via Firebase Analytics
     if (analyticsInstance) logEvent(analyticsInstance, 'tab_view', { tab_name: target });
@@ -451,6 +453,7 @@ async function showResults() {
     `;
 
     if (analyticsInstance) logEvent(analyticsInstance, 'quiz_complete', { score: pct });
+    setReadinessState({ quizScore: score, quizTotal: total });
     document.getElementById('retake-btn')?.addEventListener('click', retakeQuiz);
   } catch (e) {
     container.innerHTML = `
@@ -797,7 +800,7 @@ async function loadPresident() {
 /* ── i18n — bilingual UI (EN / HI) ──────────────────────── */
 const I18N = {
   en: {
-    nav: ['🏠 Home', '🗳️ How to Vote', '📋 Registration', '🎯 Quiz', '📍 ECI Map', '🤖 AI Assistant', '📅 Dates', '🏛️ Parliament', '🗺️ States & UTs', '🇮🇳 President', '🌐 Translate', '📢 Updates'],
+    nav: ['🏠 Home', '🗳️ How to Vote', '📋 Registration', '🎯 Quiz', '📍 ECI Map', '🤖 AI Assistant', '📅 Dates', '🏛️ Parliament', '🗺️ States & UTs', '🇮🇳 President', '🌐 Translate', '📢 Updates', '⚡ EVM Demo', '✅ Checklist'],
     heroTag: "India's Democracy Guide",
     heroH1: 'Your Vote,<br><span>Your Voice</span>',
     heroSub: 'Understand Indian elections — from Lok Sabha to Panchayat — with AI-powered guidance. Know your rights, register to vote, and participate in democracy.',
@@ -817,7 +820,7 @@ const I18N = {
     secTitle_updates: 'ECI Updates & Announcements',
   },
   hi: {
-    nav: ['🏠 होम', '🗳️ मतदान कैसे करें', '📋 पंजीकरण', '🎯 क्विज़', '📍 ECI मानचित्र', '🤖 AI सहायक', '📅 तारीखें', '🏛️ संसद', '🗺️ राज्य और UTs', '🇮🇳 राष्ट्रपति', '🌐 अनुवाद', '📢 अपडेट'],
+    nav: ['🏠 होम', '🗳️ मतदान कैसे करें', '📋 पंजीकरण', '🎯 क्विज़', '📍 ECI मानचित्र', '🤖 AI सहायक', '📅 तारीखें', '🏛️ संसद', '🗺️ राज्य और UTs', '🇮🇳 राष्ट्रपति', '🌐 अनुवाद', '📢 अपडेट', '⚡ EVM डेमो', '✅ चेकलिस्ट'],
     heroTag: 'भारत का लोकतंत्र गाइड',
     heroH1: 'आपका वोट,<br><span>आपकी आवाज़</span>',
     heroSub: 'लोक सभा से पंचायत तक भारतीय चुनावों को AI-संचालित मार्गदर्शन के साथ समझें। अपने अधिकार जानें, मतदाता पंजीकरण करें और लोकतंत्र में भाग लें।',
@@ -975,6 +978,7 @@ async function doTextToSpeech() {
     }
 
     if (analyticsInstance) logEvent(analyticsInstance, 'tts_request', { language, text_length: text.length });
+    trackFeatureUsed();
   } catch (e) {
     statusEl.textContent = '⚠ Speech generation failed. Please try again.';
   } finally {
@@ -1053,9 +1057,370 @@ async function verifyVoterID() {
   }
 }
 
+/* ── Voter Readiness Score ───────────────────────────────── */
+const READINESS_KEY = 'vw_readiness';
+
+function getReadinessState() {
+  try { return JSON.parse(localStorage.getItem(READINESS_KEY) || '{}'); } catch { return {}; }
+}
+
+function setReadinessState(patch) {
+  const state = { ...getReadinessState(), ...patch };
+  localStorage.setItem(READINESS_KEY, JSON.stringify(state));
+  updateReadinessWidget();
+}
+
+function updateReadinessWidget() {
+  const state = getReadinessState();
+  const checklistDone = parseInt(state.checklistDone || 0);
+  const quizScore     = parseInt(state.quizScore     || 0);
+  const quizTotal     = parseInt(state.quizTotal     || 0);
+  const featureCount  = parseInt(state.featuresUsed  || 0);
+
+  const quizPts     = quizTotal > 0 ? Math.round((quizScore / quizTotal) * 40) : 0;
+  const checkPts    = Math.round((checklistDone / 12) * 40);
+  const featurePts  = Math.min(featureCount, 3) * Math.round(20 / 3);
+  const total       = Math.min(100, quizPts + checkPts + featurePts);
+
+  const fillEl  = document.getElementById('readiness-fill');
+  const pctEl   = document.getElementById('readiness-pct');
+  const meterEl = document.querySelector('.readiness-meter');
+  if (fillEl)  { fillEl.style.width = total + '%'; }
+  if (pctEl)   { pctEl.textContent = total + '%'; }
+  if (meterEl) { meterEl.setAttribute('aria-valuenow', total); }
+
+  const rdQuiz = document.getElementById('rd-quiz');
+  const rdCl   = document.getElementById('rd-checklist');
+  const rdFeat = document.getElementById('rd-features');
+
+  if (rdQuiz) rdQuiz.innerHTML = `<span class="rd-icon">🎯</span> Quiz: ${quizTotal > 0 ? quizScore + '/' + quizTotal + ' correct' : 'Not taken'}`;
+  if (rdCl)   rdCl.innerHTML   = `<span class="rd-icon">✅</span> Checklist: ${checklistDone} / 12 tasks`;
+  if (rdFeat) rdFeat.innerHTML = `<span class="rd-icon">🔧</span> Features tried: ${Math.min(featureCount, 3)} / 3`;
+}
+
+function trackFeatureUsed() {
+  const state = getReadinessState();
+  const current = parseInt(state.featuresUsed || 0);
+  if (current < 3) setReadinessState({ featuresUsed: current + 1 });
+}
+
+/* ── EVM Simulator ───────────────────────────────────────── */
+let evmLoaded = false;
+let evmEnabled = false;
+let evmVoted   = false;
+let evmCandidates = [];
+
+async function initEVM() {
+  if (evmLoaded) return;
+  try {
+    const res  = await fetch('/api/evm/candidates');
+    const data = await res.json();
+    evmCandidates = data.candidates;
+    evmLoaded = true;
+    renderEVMCandidates();
+  } catch (e) {
+    document.getElementById('evm-candidates-list').innerHTML = '<div class="error-state">Failed to load EVM candidates.</div>';
+  }
+}
+
+function renderEVMCandidates() {
+  const list = document.getElementById('evm-candidates-list');
+  if (!list) return;
+  list.innerHTML = evmCandidates.map(c => `
+    <div class="evm-candidate-row" id="evm-row-${c.id}" role="listitem">
+      <div class="evm-slot-num" aria-hidden="true">${c.slotNum}</div>
+      <div class="evm-symbol" aria-hidden="true">${escHtml(c.symbol)}</div>
+      <div class="evm-cand-info">
+        <div class="evm-cand-name">${escHtml(c.name)}</div>
+        <div class="evm-cand-party">${escHtml(c.party)}</div>
+      </div>
+      <button class="evm-vote-btn" id="evm-btn-${c.id}"
+        onclick="evmCastVote(${c.id})"
+        aria-label="Vote for ${escHtml(c.name)} of ${escHtml(c.party)}"
+        disabled>
+        ▮ VOTE
+      </button>
+      <div class="evm-led" id="evm-led-${c.id}" aria-hidden="true"></div>
+    </div>
+  `).join('');
+}
+
+function evmEnableVoting() {
+  if (evmVoted) return;
+  evmEnabled = true;
+
+  const led    = document.getElementById('evm-ctrl-led');
+  const status = document.getElementById('evm-ctrl-status');
+  const btn    = document.getElementById('evm-ballot-btn');
+  if (led)    { led.classList.add('active'); }
+  if (status) { status.textContent = 'Voting enabled — press a candidate button to cast your vote'; }
+  if (btn)    { btn.disabled = true; btn.textContent = '✓ ENABLED'; }
+
+  // Enable candidate buttons
+  evmCandidates.forEach(c => {
+    const voteBtn = document.getElementById('evm-btn-' + c.id);
+    if (voteBtn) voteBtn.disabled = false;
+  });
+
+  // Update step indicator
+  setEVMStep(2);
+
+  if (analyticsInstance) logEvent(analyticsInstance, 'evm_ballot_enabled', {});
+}
+
+function evmCastVote(candidateId) {
+  if (!evmEnabled || evmVoted) return;
+  evmVoted = true;
+
+  const candidate = evmCandidates.find(c => c.id === candidateId);
+  if (!candidate) return;
+
+  // Disable all buttons
+  evmCandidates.forEach(c => {
+    const btn = document.getElementById('evm-btn-' + c.id);
+    if (btn) btn.disabled = true;
+  });
+
+  // Light up the selected LED (green)
+  const led = document.getElementById('evm-led-' + candidateId);
+  if (led) led.classList.add('voted');
+
+  // Play beep via AudioContext
+  playEVMBeep();
+
+  // Show VVPAT slip
+  showVVPATSlip(candidate);
+
+  // Update step
+  setEVMStep(3);
+
+  if (analyticsInstance) logEvent(analyticsInstance, 'evm_vote_cast', { candidate: candidate.name });
+}
+
+function playEVMBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch (e) { /* audio not available */ }
+}
+
+function showVVPATSlip(candidate) {
+  const idleEl  = document.getElementById('vvpat-idle');
+  const slipEl  = document.getElementById('vvpat-slip');
+  const infoEl  = document.getElementById('vvpat-info');
+  const symEl   = document.getElementById('vvpat-symbol');
+  const nameEl  = document.getElementById('vvpat-name');
+  const partyEl = document.getElementById('vvpat-party');
+  const numEl   = document.getElementById('vvpat-num');
+  const secsEl  = document.getElementById('vvpat-secs');
+
+  if (idleEl)  idleEl.style.display  = 'none';
+  if (slipEl)  { slipEl.style.display = 'flex'; slipEl.classList.add('slide-in'); }
+  if (symEl)   symEl.textContent   = candidate.symbol;
+  if (nameEl)  nameEl.textContent  = candidate.name;
+  if (partyEl) partyEl.textContent = candidate.party;
+  if (numEl)   numEl.textContent   = 'Serial No. ' + candidate.slotNum;
+  if (infoEl)  infoEl.textContent  = 'Verify: Is this the candidate you chose?';
+
+  let secs = 7;
+  if (secsEl) secsEl.textContent = secs;
+
+  const timer = setInterval(() => {
+    secs--;
+    if (secsEl) secsEl.textContent = secs;
+    if (secs <= 0) {
+      clearInterval(timer);
+      if (slipEl) slipEl.style.display = 'none';
+      if (idleEl) { idleEl.style.display = 'flex'; idleEl.innerHTML = '<div style="color:var(--green);font-size:1.1rem;">✅ VVPAT slip verified and destroyed</div>'; }
+      showEVMResult(candidate);
+    }
+  }, 1000);
+}
+
+function showEVMResult(candidate) {
+  setEVMStep(4);
+  const card    = document.getElementById('evm-result-card');
+  const textEl  = document.getElementById('evm-result-text');
+  const status  = document.getElementById('evm-ctrl-status');
+
+  if (textEl) textEl.innerHTML = `
+    Your vote for <strong style="color:var(--saffron)">${escHtml(candidate.name)}</strong>
+    (${escHtml(candidate.party)}) has been recorded. 🗳️<br><br>
+    The Booth Officer will now apply <strong>indelible ink</strong> to your left index finger.
+  `;
+  if (card) card.style.display = 'block';
+  if (status) status.textContent = 'Vote cast successfully — indelible ink will be applied';
+
+  trackFeatureUsed();
+}
+
+function evmReset() {
+  evmEnabled = false;
+  evmVoted   = false;
+
+  const led    = document.getElementById('evm-ctrl-led');
+  const status = document.getElementById('evm-ctrl-status');
+  const btn    = document.getElementById('evm-ballot-btn');
+  const card   = document.getElementById('evm-result-card');
+  const idleEl = document.getElementById('vvpat-idle');
+  const slipEl = document.getElementById('vvpat-slip');
+  const infoEl = document.getElementById('vvpat-info');
+
+  if (led)    led.classList.remove('active');
+  if (status) status.textContent = 'Ready — Booth Officer must enable voting';
+  if (btn)    { btn.disabled = false; btn.textContent = '▶ BALLOT'; }
+  if (card)   card.style.display = 'none';
+  if (idleEl) {
+    idleEl.style.display = 'flex';
+    idleEl.innerHTML = '<div style="font-size:1.5rem;margin-bottom:0.4rem;">📋</div><div>VVPAT slip appears here after you vote</div><div style="font-size:0.72rem;margin-top:0.4rem;opacity:0.7;">Visible for 7 seconds per ECI rules</div>';
+  }
+  if (slipEl) slipEl.style.display = 'none';
+  if (infoEl) infoEl.textContent = 'Enable voting and select a candidate to see the VVPAT slip.';
+
+  evmCandidates.forEach(c => {
+    const voteBtn = document.getElementById('evm-btn-' + c.id);
+    const cLed    = document.getElementById('evm-led-' + c.id);
+    if (voteBtn) { voteBtn.disabled = true; }
+    if (cLed)    cLed.classList.remove('voted');
+  });
+
+  setEVMStep(1);
+}
+
+function setEVMStep(n) {
+  document.querySelectorAll('.evm-step').forEach(el => {
+    const stepNum = parseInt(el.dataset.step);
+    el.classList.toggle('active',    stepNum === n);
+    el.classList.toggle('completed', stepNum < n);
+  });
+}
+
+/* ── Smart Voter Checklist ───────────────────────────────── */
+let checklistLoaded = false;
+const CHECKLIST_KEY = 'vw_checklist';
+
+function getChecklistState() {
+  try { return JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}'); } catch { return {}; }
+}
+
+async function initChecklist() {
+  if (checklistLoaded) return;
+  try {
+    const res  = await fetch('/api/checklist');
+    const data = await res.json();
+    checklistLoaded = true;
+    renderChecklist(data.items);
+  } catch (e) {
+    document.getElementById('checklist-items').innerHTML = '<div class="error-state">Failed to load checklist.</div>';
+  }
+}
+
+function renderChecklist(items) {
+  const state   = getChecklistState();
+  const listEl  = document.getElementById('checklist-items');
+  if (!listEl) return;
+
+  listEl.innerHTML = items.map(item => `
+    <label class="checklist-item ${state[item.id] ? 'done' : ''}" role="listitem" for="cl-${item.id}">
+      <input type="checkbox" id="cl-${item.id}" ${state[item.id] ? 'checked' : ''}
+        onchange="toggleChecklistItem('${item.id}', this.checked)"
+        aria-label="${escHtml(item.task)}" />
+      <span class="cl-icon" aria-hidden="true">${item.icon}</span>
+      <span class="cl-content">
+        <span class="cl-task">${escHtml(item.task)}</span>
+        <span class="cl-hint">${escHtml(item.hint)}</span>
+      </span>
+      <span class="cl-priority priority-${item.priority}" aria-label="Priority: ${item.priority}">${item.priority}</span>
+    </label>
+  `).join('');
+
+  updateChecklistProgress();
+  if (analyticsInstance) logEvent(analyticsInstance, 'page_view', { tab_name: 'checklist' });
+}
+
+function toggleChecklistItem(id, checked) {
+  const state = getChecklistState();
+  state[id] = checked;
+  localStorage.setItem(CHECKLIST_KEY, JSON.stringify(state));
+
+  // Update row styling
+  const label = document.querySelector(`label[for="cl-${id}"]`);
+  if (label) label.classList.toggle('done', checked);
+
+  updateChecklistProgress();
+  trackFeatureUsed();
+}
+
+function updateChecklistProgress() {
+  const state   = getChecklistState();
+  const total   = 12;
+  const done    = Object.values(state).filter(Boolean).length;
+  const pct     = Math.round((done / total) * 100);
+
+  const doneEl  = document.getElementById('cl-done');
+  const barEl   = document.getElementById('cl-bar-fill');
+  const pctBadge = document.getElementById('cl-pct-badge');
+  const badgeIcon = document.getElementById('cl-badge-icon');
+  const badgeText = document.getElementById('cl-badge-text');
+
+  if (doneEl)   doneEl.textContent  = done;
+  if (barEl)    barEl.style.width   = pct + '%';
+  if (pctBadge) pctBadge.textContent = pct + '%';
+
+  if (badgeIcon && badgeText) {
+    if (done === total) {
+      badgeIcon.textContent = '🏅';
+      badgeText.innerHTML   = '<strong style="color:var(--gold)">🎉 Citizen Voter Badge Unlocked!</strong><br>You\'re fully prepared to vote. Go exercise your democratic right!';
+    } else if (done >= 9) {
+      badgeIcon.textContent = '🥈';
+      badgeText.innerHTML   = `<strong style="color:var(--saffron)">Almost there!</strong><br>Complete ${total - done} more task${total - done > 1 ? 's' : ''} to unlock your badge.`;
+    } else if (done >= 6) {
+      badgeIcon.textContent = '🥉';
+      badgeText.innerHTML   = `<strong>Good progress!</strong><br>Complete ${total - done} more tasks to unlock your badge.`;
+    } else {
+      badgeIcon.textContent = '🔒';
+      badgeText.innerHTML   = `Complete all 12 tasks to unlock your <strong style="color:var(--gold)">Citizen Voter</strong> badge!`;
+    }
+  }
+
+  // Update readiness widget
+  setReadinessState({ checklistDone: done });
+}
+
+function checklistSelectAll() {
+  const state = {};
+  for (let i = 1; i <= 12; i++) state['c' + i] = true;
+  localStorage.setItem(CHECKLIST_KEY, JSON.stringify(state));
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => {
+    cb.checked = true;
+    const label = cb.closest('label');
+    if (label) label.classList.add('done');
+  });
+  updateChecklistProgress();
+}
+
+function checklistClearAll() {
+  localStorage.removeItem(CHECKLIST_KEY);
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => {
+    cb.checked = false;
+    const label = cb.closest('label');
+    if (label) label.classList.remove('done');
+  });
+  updateChecklistProgress();
+}
+
 /* ── Final Initialization ────────────────────────────────── */
 window.addEventListener('load', () => {
   initFirebase();
   loadHomeData();
   loadSteps();
+  updateReadinessWidget();
 });

@@ -217,6 +217,41 @@ const ELECTION_DATA = {
       answer: 3,
       explain: 'Rajya Sabha members serve 6-year terms. One-third of members retire every 2 years, making it a permanent house — it is never fully dissolved.',
     },
+    {
+      id: 'q11',
+      q: 'What is the full form of EPIC?',
+      options: ['Electoral Photo Identity Card', 'Election Participation Identity Certificate', 'Electoral Polling Identity Card', 'Election Commission Identity Protocol'],
+      answer: 0,
+      explain: 'EPIC stands for Electoral Photo Identity Card, commonly known as the Voter ID card, issued by the Election Commission of India.',
+    },
+    {
+      id: 'q12',
+      q: 'Under which Article of the Constitution is the Election Commission of India established?',
+      options: ['Article 312', 'Article 324', 'Article 356', 'Article 370'],
+      answer: 1,
+      explain: 'Article 324 of the Indian Constitution establishes the Election Commission and vests it with superintendence, direction, and control of all elections to Parliament and State Legislatures.',
+    },
+    {
+      id: 'q13',
+      q: 'What is the minimum age to contest a Lok Sabha election?',
+      options: ['18 years', '21 years', '25 years', '30 years'],
+      answer: 2,
+      explain: 'A candidate must be at least 25 years old to contest elections to the Lok Sabha. For Rajya Sabha, the minimum age is 30 years.',
+    },
+    {
+      id: 'q14',
+      q: 'When does the Model Code of Conduct (MCC) come into force?',
+      options: ['On polling day', 'When nominations open', 'On announcement of election schedule', 'When results are declared'],
+      answer: 2,
+      explain: 'The MCC comes into force immediately on announcement of the election schedule by the ECI and remains in effect until results are declared.',
+    },
+    {
+      id: 'q15',
+      q: 'Which form is used to report deletion of a name from the voter list?',
+      options: ['Form 6', 'Form 6A', 'Form 7', 'Form 8'],
+      answer: 2,
+      explain: 'Form 7 is used to object to the inclusion of a name or to report deletion. Form 6 is for new enrollment, Form 6A for NRIs, and Form 8 for corrections.',
+    },
   ],
 
   announcements: [
@@ -225,6 +260,31 @@ const ELECTION_DATA = {
     { id: 'a3', text: 'Bihar Assembly Elections scheduled for late 2025. Check ECI for official dates.',     type: 'warning', time: 'Upcoming' },
     { id: 'a4', text: 'Voter Helpline 1950 now available 24x7 during election season',                       type: 'info',    time: 'Update' },
     { id: 'a5', text: 'Supreme Court mandates 100% VVPAT verification in phased manner',                     type: 'info',    time: 'Policy' },
+  ],
+
+  checklistItems: [
+    { id: 'c1',  task: 'Check your voter registration status',         hint: 'Visit voters.eci.gov.in or call 1950',              icon: '📋', priority: 'high'   },
+    { id: 'c2',  task: 'Verify your name in the electoral roll',       hint: 'Use electoralsearch.eci.gov.in',                    icon: '🔍', priority: 'high'   },
+    { id: 'c3',  task: 'Keep your Voter ID (EPIC) card ready',         hint: 'Or download e-EPIC from the NVSP portal',           icon: '🆔', priority: 'high'   },
+    { id: 'c4',  task: 'Find out your polling booth location',          hint: 'Available on electoralsearch.eci.gov.in',           icon: '📍', priority: 'high'   },
+    { id: 'c5',  task: 'Note the date and phase of your election',      hint: 'Check ECI official election schedule',              icon: '📅', priority: 'high'   },
+    { id: 'c6',  task: 'Read about candidates in your constituency',    hint: 'View affidavits at affidavit.eci.gov.in',           icon: '📰', priority: 'medium' },
+    { id: 'c7',  task: 'Know your voting rights',                       hint: 'Right to vote freely without fear or inducement',   icon: '⚖️', priority: 'medium' },
+    { id: 'c8',  task: 'Prepare alternate ID documents if needed',      hint: 'Aadhaar, Passport, Bank Passbook, or PAN card',     icon: '📄', priority: 'medium' },
+    { id: 'c9',  task: 'Plan your route to the polling booth',          hint: 'Arrive early to avoid long queues',                 icon: '🗺️', priority: 'medium' },
+    { id: 'c10', task: 'Inform your family and friends to vote',        hint: 'Increase voter turnout in your community',          icon: '👨‍👩‍👧', priority: 'low'    },
+    { id: 'c11', task: 'Download the Voter Helpline App',               hint: 'Available on iOS and Android from ECI',             icon: '📱', priority: 'low'    },
+    { id: 'c12', task: 'Try the interactive EVM Demo on this app',      hint: 'Learn how the EVM and VVPAT work before voting',    icon: '⚡', priority: 'low'    },
+  ],
+
+  evmCandidates: [
+    { id: 1, name: 'Priya Sharma',   party: 'Progressive India Party', symbol: '🌸', color: '#FF6B00', slotNum: 1 },
+    { id: 2, name: 'Rahul Verma',    party: 'United Democratic Front', symbol: '✋', color: '#138808', slotNum: 2 },
+    { id: 3, name: 'Suresh Kumar',   party: "People's Alliance",       symbol: '🚲', color: '#0055CC', slotNum: 3 },
+    { id: 4, name: 'Meena Patel',    party: 'National Reform Party',   symbol: '🌟', color: '#800080', slotNum: 4 },
+    { id: 5, name: 'Anand Singh',    party: 'Rural Development Party', symbol: '🌾', color: '#8B4513', slotNum: 5 },
+    { id: 6, name: 'Lakshmi Devi',   party: 'Independent',             symbol: '🏺', color: '#666666', slotNum: 6 },
+    { id: 7, name: 'NOTA',           party: 'None of the Above',       symbol: '✗',  color: '#444444', slotNum: 7 },
   ],
 };
 
@@ -374,3 +434,7 @@ const PRESIDENT = {
 };
 
 module.exports = { ELECTION_DATA, STATES, UNION_TERRITORIES, LOK_SABHA, RAJYA_SABHA, PRESIDENT };
+
+// Re-export convenience accessors used by routes
+module.exports.CHECKLIST_ITEMS  = ELECTION_DATA.checklistItems;
+module.exports.EVM_CANDIDATES   = ELECTION_DATA.evmCandidates;

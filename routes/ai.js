@@ -7,7 +7,10 @@ const { apiLimiter, chatLimiter } = require('../middleware/rateLimiters');
 
 const router = express.Router();
 
-const SUPPORTED_LANGUAGES = ['hindi', 'tamil', 'telugu', 'kannada', 'marathi', 'bengali', 'gujarati', 'punjabi', 'malayalam', 'odia'];
+const SUPPORTED_LANGUAGES = [
+  'hindi', 'tamil', 'telugu', 'kannada', 'marathi', 'bengali', 'gujarati', 'punjabi', 'malayalam', 'odia',
+  'urdu', 'assamese', 'nepali', 'sindhi', 'konkani', 'maithili', 'dogri', 'kashmiri', 'manipuri', 'sanskrit', 'santhali', 'bodo',
+];
 
 /** @route POST /api/translate */
 router.post('/translate', apiLimiter, async (req, res) => {
@@ -151,7 +154,7 @@ router.post('/vision/verify-voter-id', apiLimiter, async (req, res) => {
 /** @route POST /api/analytics/export */
 router.post('/analytics/export', apiLimiter, async (req, res) => {
   const { eventType, eventData, sessionId } = req.body;
-  const VALID_EVENTS = ['quiz_complete', 'chat_message', 'page_view', 'translation', 'tts_request', 'voter_id_scan'];
+  const VALID_EVENTS = ['quiz_complete', 'chat_message', 'page_view', 'translation', 'tts_request', 'voter_id_scan', 'evm_vote_cast', 'checklist_update', 'nl_analysis'];
 
   if (!eventType || !VALID_EVENTS.includes(eventType)) {
     return res.status(400).json({ error: `Invalid eventType. Valid: ${VALID_EVENTS.join(', ')}` });

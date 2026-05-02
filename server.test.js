@@ -134,7 +134,7 @@ describe('GET /api/quiz', () => {
     const res = await api().get('/api/quiz');
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body.questions)).toBe(true);
-    expect(res.body.total).toBe(10);
+    expect(res.body.total).toBe(ELECTION_DATA.quizQuestions.length);
   });
 
   it('does not expose answers to client', async () => {
@@ -157,21 +157,22 @@ describe('GET /api/quiz', () => {
 });
 
 describe('POST /api/quiz/submit', () => {
-  const validAnswers = new Array(10).fill(0);
+  const qLen = () => ELECTION_DATA.quizQuestions.length;
+  const validAnswers = () => new Array(qLen()).fill(0);
 
   it('returns score and results for valid submission', async () => {
     const res = await api().post('/api/quiz/submit')
-      .send({ answers: validAnswers, sessionId: 'test-session' });
+      .send({ answers: validAnswers(), sessionId: 'test-session' });
     expect(res.statusCode).toBe(200);
     expect(typeof res.body.score).toBe('number');
-    expect(res.body.total).toBe(10);
+    expect(res.body.total).toBe(qLen());
     expect(typeof res.body.percentage).toBe('number');
-    expect(res.body.results).toHaveLength(10);
+    expect(res.body.results).toHaveLength(qLen());
   });
 
   it('each result has correct explanation', async () => {
     const res = await api().post('/api/quiz/submit')
-      .send({ answers: validAnswers, sessionId: 'test-session' });
+      .send({ answers: validAnswers(), sessionId: 'test-session' });
     res.body.results.forEach(r => {
       expect(r.explain).toBeDefined();
       expect(r.isCorrect).toBeDefined();
@@ -182,7 +183,7 @@ describe('POST /api/quiz/submit', () => {
     const correctAnswers = ELECTION_DATA.quizQuestions.map(q => q.answer);
     const res = await api().post('/api/quiz/submit')
       .send({ answers: correctAnswers, sessionId: 'test-perfect' });
-    expect(res.body.score).toBe(10);
+    expect(res.body.score).toBe(qLen());
     expect(res.body.percentage).toBe(100);
   });
 
@@ -198,7 +199,7 @@ describe('POST /api/quiz/submit', () => {
 
   it('returns 400 when answers contain non-numbers', async () => {
     const res = await api().post('/api/quiz/submit')
-      .send({ answers: new Array(10).fill('a') });
+      .send({ answers: new Array(qLen()).fill('a') });
     expect(res.statusCode).toBe(400);
   });
 });
@@ -242,7 +243,7 @@ describe('GET /api/leaderboard', () => {
     const res = await api().get('/api/leaderboard');
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body.scores)).toBe(true);
-  });
+  }, 15000);
 });
 
 // ── Translate Validation ─────────────────────────────────────────────────────
@@ -610,11 +611,13 @@ describe('GET /api/president — extended', () => {
 
 // ── Quiz — extended ───────────────────────────────────────────────────────────
 describe('POST /api/quiz/submit — extended', () => {
+  const qLen = ELECTION_DATA.quizQuestions.length;
+
   it('all-correct answers produce 100%', async () => {
     const correct = ELECTION_DATA.quizQuestions.map(q => q.answer);
     const res = await api().post('/api/quiz/submit').send({ answers: correct, sessionId: 's1' });
     expect(res.body.percentage).toBe(100);
-    expect(res.body.score).toBe(10);
+    expect(res.body.score).toBe(qLen);
   });
 
   it('all-wrong answers produce 0%', async () => {
@@ -626,24 +629,28 @@ describe('POST /api/quiz/submit — extended', () => {
 
   it('result contains question text', async () => {
     const res = await api().post('/api/quiz/submit')
-      .send({ answers: new Array(10).fill(0), sessionId: 's3' });
+      .send({ answers: new Array(qLen).fill(0), sessionId: 's3' });
     res.body.results.forEach(r => {
       expect(typeof r.question).toBe('string');
       expect(r.question.length).toBeGreaterThan(0);
     });
   });
 
-  it('returns 400 when answers array has floats', async () => {
+  it('returns 200 when answers array has floats (floor treated as integers)', async () => {
     const res = await api().post('/api/quiz/submit')
-      .send({ answers: new Array(10).fill(1.5) });
+      .send({ answers: new Array(qLen).fill(1.5) });
     expect(res.statusCode).toBe(200);
   });
 
   it('truncates sessionId longer than 64 chars', async () => {
     const longId = 'x'.repeat(100);
     const res = await api().post('/api/quiz/submit')
-      .send({ answers: new Array(10).fill(0), sessionId: longId });
+      .send({ answers: new Array(qLen).fill(0), sessionId: longId });
     expect(res.statusCode).toBe(200);
+  });
+
+  it('has 15 questions total', () => {
+    expect(ELECTION_DATA.quizQuestions.length).toBe(15);
   });
 });
 
@@ -1510,10 +1517,105 @@ describe('Environment handling', () => {
   it('config shows disabled features when env vars missing', async () => {
     const originalKey = process.env.GOOGLE_CLOUD_API_KEY;
     delete process.env.GOOGLE_CLOUD_API_KEY;
-    
+
     const res = await api().get('/api/config');
     expect(res.statusCode).toBe(200);
-    
+
     if (originalKey) process.env.GOOGLE_CLOUD_API_KEY = originalKey;
+  });
+});
+
+// ── Voter Checklist ──────────────────────────────────────────────────────────
+describe('GET /api/checklist', () => {
+  it('returns checklist items array', async () => {
+    const res = await api().get('/api/checklist');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.items)).toBe(true);
+    expect(res.body.total).toBe(12);
+    expect(res.body.items).toHaveLength(12);
+  });
+
+  it('each item has required fields', async () => {
+    const res = await api().get('/api/checklist');
+    res.body.items.forEach(item => {
+      expect(item.id).toBeDefined();
+      expect(typeof item.task).toBe('string');
+      expect(item.task.length).toBeGreaterThan(0);
+      expect(item.icon).toBeDefined();
+      expect(['high', 'medium', 'low']).toContain(item.priority);
+    });
+  });
+
+  it('sets Cache-Control header', async () => {
+    const res = await api().get('/api/checklist');
+    expect(res.headers['cache-control']).toContain('max-age=3600');
+  });
+
+  it('returns X-Cache header on repeated requests', async () => {
+    await api().get('/api/checklist');
+    const res = await api().get('/api/checklist');
+    expect(['HIT', 'MISS']).toContain(res.headers['x-cache']);
+  });
+});
+
+// ── EVM Candidates ──────────────────────────────────────────────────────────
+describe('GET /api/evm/candidates', () => {
+  it('returns candidates array', async () => {
+    const res = await api().get('/api/evm/candidates');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.candidates)).toBe(true);
+    expect(res.body.total).toBe(7);
+    expect(res.body.candidates).toHaveLength(7);
+  });
+
+  it('each candidate has required fields', async () => {
+    const res = await api().get('/api/evm/candidates');
+    res.body.candidates.forEach(c => {
+      expect(typeof c.id).toBe('number');
+      expect(typeof c.name).toBe('string');
+      expect(typeof c.party).toBe('string');
+      expect(typeof c.symbol).toBe('string');
+      expect(typeof c.slotNum).toBe('number');
+    });
+  });
+
+  it('includes NOTA as last candidate', async () => {
+    const res = await api().get('/api/evm/candidates');
+    const nota = res.body.candidates.find(c => c.name === 'NOTA');
+    expect(nota).toBeDefined();
+    expect(nota.party).toBe('None of the Above');
+  });
+
+  it('sets Cache-Control header', async () => {
+    const res = await api().get('/api/evm/candidates');
+    expect(res.headers['cache-control']).toContain('max-age=3600');
+  });
+});
+
+// ── Language Support — extended ──────────────────────────────────────────────
+describe('POST /api/translate — language support', () => {
+  it('accepts urdu as a supported language', async () => {
+    const res = await api().post('/api/translate')
+      .send({ text: 'Vote for India', language: 'urdu' });
+    expect([200, 502]).toContain(res.statusCode);
+    if (res.statusCode === 200) expect(res.body.language).toBe('urdu');
+  });
+
+  it('accepts assamese as a supported language', async () => {
+    const res = await api().post('/api/translate')
+      .send({ text: 'Vote for India', language: 'assamese' });
+    expect([200, 502]).toContain(res.statusCode);
+  });
+
+  it('accepts nepali as a supported language', async () => {
+    const res = await api().post('/api/translate')
+      .send({ text: 'Vote', language: 'nepali' });
+    expect([200, 502]).toContain(res.statusCode);
+  });
+
+  it('rejects an unknown language with 400', async () => {
+    const res = await api().post('/api/translate')
+      .send({ text: 'Vote', language: 'klingon' });
+    expect(res.statusCode).toBe(400);
   });
 });

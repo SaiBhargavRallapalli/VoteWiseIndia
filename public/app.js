@@ -1443,4 +1443,8 @@ window.addEventListener('load', () => {
   loadHomeData();
   loadSteps();
   updateReadinessWidget();
+
+  document.getElementById('verify-voter-id-btn')?.addEventListener('click', verifyVoterID);
+  document.getElementById('analyze-btn')?.addEventListener('click', doAnalyze);
+  document.getElementById('tts-btn')?.addEventListener('click', doTextToSpeech);
 });

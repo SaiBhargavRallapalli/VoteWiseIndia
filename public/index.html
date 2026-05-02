@@ -145,7 +145,7 @@
             style="width:100%;font-size:0.75rem;color:var(--text-2);margin-bottom:0.6rem;"
             aria-describedby="vision-hint" />
           <span id="vision-hint" class="sr-only">Supported formats: JPG, PNG. Max 5MB.</span>
-          <button onclick="verifyVoterID()" class="btn btn-primary"
+          <button id="verify-voter-id-btn" class="btn btn-primary"
             style="width:100%;font-size:0.78rem;padding:0.5rem;"
             aria-label="Verify Voter ID with Cloud Vision API">
             🔍 Extract Text with Vision API
@@ -292,7 +292,7 @@
               placeholder="e.g. The Election Commission of India conducts Lok Sabha elections…"
               maxlength="500"
               aria-label="Election text to analyse"></textarea>
-            <button onclick="doAnalyze()" class="btn btn-primary"
+            <button id="analyze-btn" class="btn btn-primary"
               style="width:100%;font-size:0.78rem;padding:0.5rem;"
               aria-label="Analyse text with Google Natural Language API">
               Analyse with NL API
@@ -420,7 +420,7 @@
             placeholder="Enter text to convert to speech… e.g. 'Voting is your right. Visit your polling booth on election day.'"
             maxlength="500" aria-label="Text to speak" aria-describedby="tts-hint"></textarea>
           <span id="tts-hint" class="sr-only">Maximum 500 characters. Select a language above.</span>
-          <button class="btn btn-primary" id="tts-btn" onclick="doTextToSpeech()">🔊 Generate Speech</button>
+          <button class="btn btn-primary" id="tts-btn">🔊 Generate Speech</button>
           <div id="tts-result" style="margin-top:0.8rem;" aria-live="polite" aria-label="Audio output">
             <audio id="tts-audio" controls style="width:100%;display:none;" aria-label="Generated speech audio"></audio>
             <div id="tts-status" style="font-size:0.78rem;color:var(--text-2);font-family:var(--font-m);">

@@ -5,8 +5,8 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org)
 [![Google Gemini](https://img.shields.io/badge/Google-Gemini_API-blue)](https://ai.google.dev)
 [![Cloud Run](https://img.shields.io/badge/Google-Cloud_Run-blue)](https://cloud.google.com/run)
-[![Tests](https://img.shields.io/badge/Jest-175_tests-brightgreen)](./server.test.js)
-[![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen)](./server.test.js)
+[![Tests](https://img.shields.io/badge/Jest-179_tests-brightgreen)](./server.test.js)
+[![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](./server.test.js)
 [![E2E](https://img.shields.io/badge/Playwright-30_passing-blue)](./e2e)
 [![Google Services](https://img.shields.io/badge/Google_Services-13_integrated-blue)](./README.md)
 [![PromptWars](https://img.shields.io/badge/PromptWars-Virtual_2026-orange)](https://promptwars.in)
@@ -126,7 +126,7 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 | **Code Quality** | Modular architecture: `server.js` (105 lines thin entry point) + `data/` + `services/` + `middleware/` + `routes/` (12 focused modules). Full JSDoc, request logging, environment validation, no dead code, no inline secrets, `'unsafe-inline'` removed from CSP. |
 | **Security** | `helmet` (CSP + HSTS in production), `cors` via `ALLOWED_ORIGIN`, per-route rate limits (20/min chat, 100/min data), `trust proxy`, 10mb JSON cap (for image uploads), server-only API keys, `escHtml` XSS protection, Firebase OAuth. |
 | **Efficiency** | In-memory API cache (30s TTL + X-Cache header), gzip compression, 1-day `Cache-Control` on static assets in production, lazy panel fetches, single bundle from `public/`. |
-| **Testing** | **175** Jest + Supertest API tests (~93.7% coverage) covering all 21 routes, Google Cloud services (mocked), cache behaviour, input validation, and security headers. **30** Playwright E2E tests (navigation, quiz, chat, accessibility). CI via `.github/workflows/ci.yml`. |
+| **Testing** | **179** Jest + Supertest API tests (~94.7% coverage) covering all 21 routes, Google Cloud services (mocked), cache behaviour, input validation, and security headers. **30** Playwright E2E tests (navigation, quiz, chat, accessibility). CI via `.github/workflows/ci.yml`. |
 | **Accessibility** | `role="tablist"` + `aria-controls` on every tab, skip link, `aria-live` for chat/quiz/translate/TTS, landmarks, single `h1`, WCAG 2.1 AA contrast, `prefers-reduced-motion` respected, Text-to-Speech for screen reader alternative. |
 | **Google Services** | **9 distinct Google Cloud services** — Cloud Translation, Text-to-Speech, Vision, Natural Language, Gemini, Firestore, Auth, Analytics, BigQuery. Six AI/ML workflows: chat, translation, TTS, OCR, entity extraction, sentiment. |
 
@@ -150,7 +150,7 @@ India has 96.8 crore eligible voters, many of them first-time voters, rural citi
 ```
 VoteWiseIndia/
 ├── server.js              # Thin entry point (105 lines) — mounts all routes
-├── server.test.js         # Jest + Supertest — 175 API tests (~93.7% coverage)
+├── server.test.js         # Jest + Supertest — 179 API tests (~94.7% coverage)
 ├── data/
 │   └── electionData.js    # All static Indian electoral data (ELECTION_DATA, STATES, etc.)
 ├── middleware/
@@ -200,7 +200,7 @@ cp .env.example .env
 npm start
 # → http://localhost:8080
 
-# API tests (175 tests)
+# API tests (179 tests)
 npm test
 
 # E2E browser tests (install browsers once)

@@ -1331,7 +1331,7 @@ function renderChecklist(items) {
   listEl.innerHTML = items.map(item => `
     <label class="checklist-item ${state[item.id] ? 'done' : ''}" role="listitem" for="cl-${item.id}">
       <input type="checkbox" id="cl-${item.id}" ${state[item.id] ? 'checked' : ''}
-        onchange="toggleChecklistItem('${item.id}', this.checked)"
+        data-cl-id="${escHtml(item.id)}"
         aria-label="${escHtml(item.task)}" />
       <span class="cl-icon" aria-hidden="true">${item.icon}</span>
       <span class="cl-content">
@@ -1341,6 +1341,16 @@ function renderChecklist(items) {
       <span class="cl-priority priority-${item.priority}" aria-label="Priority: ${item.priority}">${item.priority}</span>
     </label>
   `).join('');
+
+  // Event delegation for checkbox toggles
+  listEl.addEventListener('change', e => {
+    const cb = e.target.closest('input[type="checkbox"][data-cl-id]');
+    if (cb) toggleChecklistItem(cb.dataset.clId, cb.checked);
+  });
+
+  // Wire action buttons (safe to call multiple times — replaceWith clones them)
+  document.getElementById('cl-select-all')?.addEventListener('click', checklistSelectAll);
+  document.getElementById('cl-clear-all')?.addEventListener('click', checklistClearAll);
 
   updateChecklistProgress();
   if (analyticsInstance) logEvent(analyticsInstance, 'page_view', { tab_name: 'checklist' });

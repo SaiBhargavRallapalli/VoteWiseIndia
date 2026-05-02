@@ -1619,3 +1619,57 @@ describe('POST /api/translate — language support', () => {
     expect(res.statusCode).toBe(400);
   });
 });
+
+describe('POST /api/translate — network throw coverage', () => {
+  it('returns 502 when translateWithCloudAPI throws', async () => {
+    const orig = global.fetch;
+    global.fetch = jest.fn().mockRejectedValue(new Error('network down'));
+    process.env.GEMINI_API_KEY = 'test-key';
+    process.env.GOOGLE_CLOUD_API_KEY = 'test-key';
+    const res = await api().post('/api/translate')
+      .send({ text: 'Hello India', language: 'hindi' });
+    expect(res.statusCode).toBe(502);
+    global.fetch = orig;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+  });
+});
+
+describe('POST /api/text-to-speech — null result coverage', () => {
+  it('returns 502 when TTS returns null', async () => {
+    const orig = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, json: async () => ({}) });
+    process.env.GOOGLE_CLOUD_API_KEY = 'test-key';
+    const res = await api().post('/api/text-to-speech')
+      .send({ text: 'Hello', language: 'hi' });
+    expect(res.statusCode).toBe(502);
+    global.fetch = orig;
+    delete process.env.GOOGLE_CLOUD_API_KEY;
+  });
+});
+
+describe('GET /api/config — Firebase env vars present', () => {
+  it('returns firebase config keys when env vars are set', async () => {
+    process.env.FIREBASE_API_KEY        = 'test-fb-key';
+    process.env.FIREBASE_AUTH_DOMAIN    = 'test.firebaseapp.com';
+    process.env.FIREBASE_PROJECT_ID     = 'test-project';
+    process.env.FIREBASE_MEASUREMENT_ID = 'G-TEST123';
+    const res = await api().get('/api/config');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.firebase.apiKey).toBe('test-fb-key');
+    expect(res.body.features.auth).toBe(true);
+    expect(res.body.features.analytics).toBe(true);
+    delete process.env.FIREBASE_API_KEY;
+    delete process.env.FIREBASE_AUTH_DOMAIN;
+    delete process.env.FIREBASE_PROJECT_ID;
+    delete process.env.FIREBASE_MEASUREMENT_ID;
+  });
+});
+
+describe('GET /api/leaderboard — cache coverage', () => {
+  it('returns X-Cache MISS then HIT on second call', async () => {
+    const r1 = await api().get('/api/leaderboard');
+    const r2 = await api().get('/api/leaderboard');
+    expect(r1.statusCode).toBe(200);
+    expect(r2.headers['x-cache']).toBe('HIT');
+  });
+});

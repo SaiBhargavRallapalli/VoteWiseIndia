@@ -105,9 +105,7 @@ async function initFirebase() {
 
     // Catch result when user returns from Google redirect
     getRedirectResult(auth).then(result => {
-      if (result && result.user) {
-        updateAuthUI(result.user);
-      }
+      // onAuthStateChanged handles UI update automatically
     }).catch(e => {
       if (e.code !== 'auth/no-auth-event') {
         console.error('Redirect result:', e.code, e.message);

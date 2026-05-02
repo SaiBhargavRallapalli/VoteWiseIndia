@@ -9,7 +9,7 @@ function requestLogger(req, res, next) {
   res.on('finish', () => {
     const duration = Date.now() - start;
     if (url.startsWith('/api/')) {
-      console.log(`[${new Date().toISOString()}] ${req.method} ${url} ${res.statusCode} ${duration}ms`);
+      console.info(`[${new Date().toISOString()}] ${req.method} ${url} ${res.statusCode} ${duration}ms`);
     }
   });
   next();

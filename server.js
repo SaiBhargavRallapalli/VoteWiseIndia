@@ -97,9 +97,9 @@ app.use((err, _req, res, _next) => {
 const { db } = require('./services/firestore');
 
 const server = app.listen(PORT, () => {
-  console.log(`VoteWise India on http://localhost:${PORT}`);
-  console.log(`Gemini: ${process.env.GEMINI_API_KEY ? 'configured ✓' : 'demo mode'}`);
-  console.log(`Firestore: ${db ? 'connected ✓' : 'not configured'}`);
+  console.info(`VoteWise India on http://localhost:${PORT}`);
+  console.info(`Gemini: ${process.env.GEMINI_API_KEY ? 'configured ✓' : 'demo mode'}`);
+  console.info(`Firestore: ${db ? 'connected ✓' : 'not configured'}`);
 });
 
 module.exports = { app, server, ELECTION_DATA };

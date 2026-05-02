@@ -1500,7 +1500,7 @@ describe('Structured error responses', () => {
 // ── Request logging middleware ───────────────────────────────────────────────
 describe('Request logging', () => {
   it('logs API requests with timing', async () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
     await api().get('/api/health');
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();

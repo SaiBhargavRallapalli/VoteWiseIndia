@@ -239,7 +239,7 @@ router.post('/chat', chatLimiter, async (req, res) => {
     const data  = await geminiRes.json();
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!reply) return res.status(502).json({ error: 'Empty response from AI. Please try again.' });
+    if (!reply) { return res.status(502).json({ error: 'Empty response from AI. Please try again.' }); }
 
     res.json({ reply });
   } catch (err) {

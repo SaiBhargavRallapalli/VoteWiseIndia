@@ -20,7 +20,7 @@ try {
  * @param {number} total     - Total number of questions
  */
 async function saveQuizScore(sessionId, score, total) {
-  if (!db) return;
+  if (!db) { return; }
   try {
     await db.collection('quizScores').add({
       sessionId,
@@ -41,7 +41,7 @@ async function saveQuizScore(sessionId, score, total) {
  * @returns {Promise<Array>} Array of score objects
  */
 async function getTopScores(limit = 10) {
-  if (!db) return [];
+  if (!db) { return []; }
   try {
     const snap = await db.collection('quizScores')
       .orderBy('percentage', 'desc')

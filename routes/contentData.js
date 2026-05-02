@@ -10,7 +10,7 @@ const router = express.Router();
 /** @route GET /api/dates */
 router.get('/dates', apiLimiter, (_req, res) => {
   const cached = getCached('dates');
-  if (cached) return res.set('X-Cache', 'HIT').json(cached);
+  if (cached) { return res.set('X-Cache', 'HIT').json(cached); }
 
   const dates = ELECTION_DATA.importantDates.map(d => ({
     ...d,
@@ -118,8 +118,8 @@ router.get('/analyze', apiLimiter, async (req, res) => {
 router.get('/states', apiLimiter, (req, res) => {
   const { region, type } = req.query;
   let states = [...STATES, ...UNION_TERRITORIES];
-  if (type && (type === 'state' || type === 'ut')) states = states.filter(s => s.type === type);
-  if (region) states = states.filter(s => s.region.toLowerCase() === decodeURIComponent(region).toLowerCase());
+  if (type && (type === 'state' || type === 'ut')) { states = states.filter(s => s.type === type); }
+  if (region) { states = states.filter(s => s.region.toLowerCase() === decodeURIComponent(region).toLowerCase()); }
   res.set('Cache-Control', 'public, max-age=3600').json({
     states, total: states.length,
     totalStates: STATES.length, totalUTs: UNION_TERRITORIES.length,
@@ -129,7 +129,7 @@ router.get('/states', apiLimiter, (req, res) => {
 /** @route GET /api/parliament */
 router.get('/parliament', apiLimiter, (_req, res) => {
   const cached = getCached('parliament');
-  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached);
+  if (cached) { return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached); }
   const data = { lokSabha: LOK_SABHA, rajyaSabha: RAJYA_SABHA };
   setCache('parliament', data);
   res.set('X-Cache', 'MISS').set('Cache-Control', 'public, max-age=3600').json(data);
@@ -138,7 +138,7 @@ router.get('/parliament', apiLimiter, (_req, res) => {
 /** @route GET /api/president */
 router.get('/president', apiLimiter, (_req, res) => {
   const cached = getCached('president');
-  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached);
+  if (cached) { return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached); }
   setCache('president', PRESIDENT);
   res.set('X-Cache', 'MISS').set('Cache-Control', 'public, max-age=3600').json(PRESIDENT);
 });

@@ -13,7 +13,7 @@ const CACHE_TTL = 30_000;
  */
 function getCached(key) {
   const entry = responseCache.get(key);
-  if (entry && Date.now() - entry.ts < CACHE_TTL) return entry.data;
+  if (entry && Date.now() - entry.ts < CACHE_TTL) { return entry.data; }
   return null;
 }
 

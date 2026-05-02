@@ -11,9 +11,9 @@ const router = express.Router();
 /** @route GET /api/election */
 router.get('/election', apiLimiter, (_req, res) => {
   const cached = getCached('election');
-  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=300').json(cached);
+  if (cached) { return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=300').json(cached); }
 
-  const { quizQuestions, ...data } = ELECTION_DATA;
+  const { quizQuestions: _quizQuestions, ...data } = ELECTION_DATA;
   setCache('election', data);
   res.set('X-Cache', 'MISS').set('Cache-Control', 'public, max-age=300').json(data);
 });
@@ -21,7 +21,7 @@ router.get('/election', apiLimiter, (_req, res) => {
 /** @route GET /api/steps */
 router.get('/steps', apiLimiter, (_req, res) => {
   const cached = getCached('steps');
-  if (cached) return res.set('X-Cache', 'HIT').json(cached);
+  if (cached) { return res.set('X-Cache', 'HIT').json(cached); }
 
   const data = { votingSteps: ELECTION_DATA.votingSteps, registrationSteps: ELECTION_DATA.registrationSteps };
   setCache('steps', data);
@@ -30,7 +30,7 @@ router.get('/steps', apiLimiter, (_req, res) => {
 
 /** @route GET /api/quiz */
 router.get('/quiz', apiLimiter, (_req, res) => {
-  const questions = ELECTION_DATA.quizQuestions.map(({ answer, explain, ...q }) => q);
+  const questions = ELECTION_DATA.quizQuestions.map(({ answer: _answer, explain: _explain, ...q }) => q);
   res.set('Cache-Control', 'public, max-age=600').json({ questions, total: questions.length });
 });
 
@@ -69,7 +69,7 @@ router.post('/quiz/submit', apiLimiter, async (req, res) => {
 /** @route GET /api/leaderboard */
 router.get('/leaderboard', apiLimiter, async (_req, res) => {
   const cached = getCached('leaderboard');
-  if (cached) return res.set('X-Cache', 'HIT').json(cached);
+  if (cached) { return res.set('X-Cache', 'HIT').json(cached); }
 
   const scores  = await getTopScores(10);
   const payload = { scores };
@@ -80,7 +80,7 @@ router.get('/leaderboard', apiLimiter, async (_req, res) => {
 /** @route GET /api/checklist */
 router.get('/checklist', apiLimiter, (_req, res) => {
   const cached = getCached('checklist');
-  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached);
+  if (cached) { return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached); }
 
   const payload = { items: CHECKLIST_ITEMS, total: CHECKLIST_ITEMS.length };
   setCache('checklist', payload);
@@ -90,7 +90,7 @@ router.get('/checklist', apiLimiter, (_req, res) => {
 /** @route GET /api/evm/candidates */
 router.get('/evm/candidates', apiLimiter, (_req, res) => {
   const cached = getCached('evm-candidates');
-  if (cached) return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached);
+  if (cached) { return res.set('X-Cache', 'HIT').set('Cache-Control', 'public, max-age=3600').json(cached); }
 
   const payload = { candidates: EVM_CANDIDATES, total: EVM_CANDIDATES.length };
   setCache('evm-candidates', payload);

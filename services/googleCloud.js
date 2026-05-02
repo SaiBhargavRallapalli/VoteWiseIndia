@@ -86,7 +86,7 @@ async function translateWithCloudAPI(text, language, cloudKey, geminiKey) {
     if (res.ok) {
       const data = await res.json();
       const translated = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (translated) return { translated, service: 'gemini-fallback' };
+      if (translated) { return { translated, service: 'gemini-fallback' }; }
     }
   }
 
@@ -102,7 +102,7 @@ async function translateWithCloudAPI(text, language, cloudKey, geminiKey) {
  * @returns {Promise<{audioContent: string, service: string}|null>}
  */
 async function textToSpeech(text, language, apiKey) {
-  if (!apiKey) return null;
+  if (!apiKey) { return null; }
 
   const voiceMap = {
     hi: { languageCode: 'hi-IN', name: 'hi-IN-Neural2-A' },
@@ -150,7 +150,7 @@ async function textToSpeech(text, language, apiKey) {
  * @returns {Promise<{text: string, confidence: number, service: string}|null>}
  */
 async function extractTextFromImage(imageBase64, apiKey) {
-  if (!apiKey) return null;
+  if (!apiKey) { return null; }
 
   try {
     const res = await fetch(

@@ -40,6 +40,10 @@ export function setupNavigation() {
       logEvent('tab_view', { tab_name: target });
     });
   });
+
+  document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => filterStates(pill));
+  });
 }
 
 export async function loadHomeData() {
@@ -236,13 +240,13 @@ function renderStates(states) {
       <tbody>
         ${states.map(s => `
           <tr>
-            <td>${escHtml(s.name)}</td>
-            <td style="color:var(--text-2)">${escHtml(s.capital)}</td>
-            <td><span class="state-badge ${s.type === 'state' ? 'badge-state' : 'badge-ut'}">${escHtml(s.type.toUpperCase())}</span></td>
-            <td style="font-family:var(--font-m);font-size:0.78rem;color:var(--saffron)">${escHtml(String(s.vidhanSabhaSeats))}</td>
-            <td style="font-family:var(--font-m);font-size:0.78rem;color:var(--green)">${escHtml(String(s.lokSabhaSeats))}</td>
-            <td style="font-family:var(--font-m);font-size:0.78rem;color:var(--gold)">${escHtml(String(s.rajyaSabhaSeats))}</td>
-            <td style="color:var(--text-3);font-size:0.75rem">${escHtml(s.region)}</td>
+            <td data-label="Name">${escHtml(s.name)}</td>
+            <td data-label="Capital" style="color:var(--text-2)">${escHtml(s.capital)}</td>
+            <td data-label="Type"><span class="state-badge ${s.type === 'state' ? 'badge-state' : 'badge-ut'}">${escHtml(s.type.toUpperCase())}</span></td>
+            <td data-label="Vidhan Sabha" style="font-family:var(--font-m);font-size:0.78rem;color:var(--saffron)">${escHtml(String(s.vidhanSabhaSeats))}</td>
+            <td data-label="Lok Sabha" style="font-family:var(--font-m);font-size:0.78rem;color:var(--green)">${escHtml(String(s.lokSabhaSeats))}</td>
+            <td data-label="Rajya Sabha" style="font-family:var(--font-m);font-size:0.78rem;color:var(--gold)">${escHtml(String(s.rajyaSabhaSeats))}</td>
+            <td data-label="Region" style="color:var(--text-3);font-size:0.75rem">${escHtml(s.region)}</td>
           </tr>
         `).join('')}
       </tbody>
